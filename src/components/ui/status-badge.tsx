@@ -10,27 +10,27 @@ interface StatusBadgeProps {
 const statusConfig: Record<StatusType, { label: string; className: string }> = {
   pending: {
     label: "Pending",
-    className: "bg-amber-100 text-amber-700 border-amber-200",
+    className: "bg-amber-500/20 text-amber-400 border-amber-500/30",
   },
   "in-progress": {
     label: "In Progress",
-    className: "bg-primary/10 text-primary border-primary/20",
+    className: "bg-primary/20 text-primary border-primary/30",
   },
   resolved: {
     label: "Resolved",
-    className: "bg-secondary/10 text-secondary border-secondary/20",
+    className: "bg-secondary/20 text-secondary border-secondary/30",
   },
   high: {
     label: "High",
-    className: "bg-destructive/10 text-destructive border-destructive/20",
+    className: "bg-destructive/20 text-destructive border-destructive/30",
   },
   medium: {
     label: "Medium",
-    className: "bg-amber-100 text-amber-700 border-amber-200",
+    className: "bg-amber-500/20 text-amber-400 border-amber-500/30",
   },
   low: {
     label: "Low",
-    className: "bg-secondary/10 text-secondary border-secondary/20",
+    className: "bg-secondary/20 text-secondary border-secondary/30",
   },
 };
 
@@ -40,7 +40,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
+        "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-sm",
         config.className,
         className
       )}
