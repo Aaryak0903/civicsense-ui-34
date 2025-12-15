@@ -2,6 +2,7 @@ import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import heroBg from "@/assets/hero-bg.jpg";
 import {
   Zap,
   FileText,
@@ -15,6 +16,8 @@ import {
   Sparkles,
   Globe,
   Shield,
+  Building2,
+  MessageSquare,
 } from "lucide-react";
 
 const steps = [
@@ -22,19 +25,19 @@ const steps = [
     icon: FileText,
     title: "Report",
     description: "Submit your civic issue with details and precise location",
-    color: "from-violet-500 to-purple-600",
+    color: "from-primary to-teal-400",
   },
   {
     icon: Cpu,
     title: "AI Analyzes",
     description: "Smart AI categorizes, prioritizes, and routes your report",
-    color: "from-cyan-500 to-teal-500",
+    color: "from-secondary to-orange-400",
   },
   {
     icon: CheckCircle2,
     title: "Resolved",
     description: "Assigned officers take action and resolve your issue",
-    color: "from-emerald-500 to-green-500",
+    color: "from-emerald-500 to-green-400",
   },
 ];
 
@@ -73,41 +76,51 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col bg-background overflow-hidden">
       <PublicNavbar />
 
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center py-20 lg:py-32">
-        {/* Animated background */}
-        <div className="absolute inset-0 gradient-mesh" />
-        <div className="floating-orb orb-primary w-[500px] h-[500px] -top-40 -left-40" />
-        <div className="floating-orb orb-secondary w-[400px] h-[400px] top-20 -right-32" style={{ animationDelay: '-5s' }} />
-        <div className="floating-orb orb-primary w-[300px] h-[300px] bottom-20 left-1/4" style={{ animationDelay: '-10s' }} />
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-[95vh] flex items-center">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroBg})` }}
+        />
+        {/* Gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/60" />
+        
+        {/* Animated accent orbs */}
+        <div className="floating-orb orb-primary w-[400px] h-[400px] -top-20 -left-20" />
+        <div className="floating-orb orb-secondary w-[300px] h-[300px] top-40 -right-20" style={{ animationDelay: '-8s' }} />
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-effect text-sm font-medium mb-8 animate-fade-in">
-              <Zap className="h-4 w-4 text-secondary" />
-              <span className="text-gradient">AI-Powered Public Welfare System</span>
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-sm font-medium mb-8 animate-fade-in">
+              <Building2 className="h-4 w-4 text-secondary" />
+              <span className="text-foreground/90">AI-Powered Public Welfare System</span>
             </div>
             
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8 animate-slide-up">
-              <span className="text-foreground">Report Issues.</span>
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-6 animate-slide-up">
+              <span className="text-foreground">Your Voice.</span>
               <br />
-              <span className="text-gradient">Transform Your City.</span>
+              <span className="text-gradient">Your City.</span>
+              <br />
+              <span className="text-gradient-warm">Your Impact.</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: "0.15s" }}>
-              CivicSense connects citizens with government for smarter, faster resolution 
-              of civic problems. From potholes to power outages — report it, track it, solve it.
+            <p className="text-lg md:text-xl text-foreground/70 max-w-xl mb-10 animate-slide-up" style={{ animationDelay: "0.15s" }}>
+              CivicSense connects citizens directly with city officials. Report infrastructure issues, 
+              track progress in real-time, and watch your community transform.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: "0.3s" }}>
+            <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: "0.3s" }}>
               <Link to="/signup">
-                <Button variant="hero" size="xl" className="group">
+                <Button variant="hero" size="xl" className="group w-full sm:w-auto">
+                  <MessageSquare className="h-5 w-5" />
                   Report an Issue
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline-hero" size="xl">
+                <Button variant="outline-hero" size="xl" className="w-full sm:w-auto">
                   <Shield className="h-5 w-5" />
                   Officer Portal
                 </Button>
@@ -115,13 +128,10 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-
-        {/* Decorative grid */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM4YjVjZjYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
       </section>
 
       {/* Stats Section */}
-      <section className="relative py-20 border-y border-border/50">
+      <section className="relative py-20 border-y border-border/30">
         <div className="absolute inset-0 gradient-subtle" />
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -131,8 +141,8 @@ export default function LandingPage() {
                 className="text-center group animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl gradient-hero mb-4 group-hover:shadow-glow-sm transition-shadow duration-500">
-                  <stat.icon className="h-6 w-6 text-primary-foreground" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl gradient-hero mb-4 group-hover:shadow-glow-sm transition-shadow duration-500">
+                  <stat.icon className="h-7 w-7 text-primary-foreground" />
                 </div>
                 <p className="font-display text-4xl md:text-5xl font-bold text-gradient mb-2">
                   {stat.value}
@@ -168,12 +178,12 @@ export default function LandingPage() {
               >
                 {/* Connector line */}
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-[2px] bg-gradient-to-r from-primary/50 to-transparent" />
+                  <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-[2px] bg-gradient-to-r from-primary/40 to-transparent" />
                 )}
                 
                 <div className="relative p-8 rounded-3xl glass-card hover:shadow-glow transition-all duration-500 group-hover:-translate-y-2">
                   {/* Step number */}
-                  <div className="absolute -top-4 -right-4 h-10 w-10 rounded-full gradient-hero flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/30">
+                  <div className="absolute -top-4 -right-4 h-10 w-10 rounded-full gradient-hero flex items-center justify-center text-primary-foreground font-bold shadow-lg">
                     {index + 1}
                   </div>
                   
@@ -194,7 +204,7 @@ export default function LandingPage() {
 
       {/* Features */}
       <section className="relative py-24 lg:py-32">
-        <div className="absolute inset-0 gradient-mesh opacity-50" />
+        <div className="absolute inset-0 gradient-mesh opacity-60" />
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-20">
             <span className="inline-block px-4 py-1.5 rounded-full glass-effect text-xs font-semibold text-secondary uppercase tracking-wider mb-4">
@@ -233,7 +243,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="relative max-w-5xl mx-auto">
             {/* Glow effect */}
-            <div className="absolute inset-0 gradient-hero rounded-[2.5rem] blur-3xl opacity-20" />
+            <div className="absolute inset-0 gradient-hero rounded-[2.5rem] blur-3xl opacity-15" />
             
             <div className="relative p-12 md:p-16 rounded-[2.5rem] gradient-hero overflow-hidden">
               {/* Decorative elements */}
@@ -252,7 +262,7 @@ export default function LandingPage() {
                 <Link to="/signup">
                   <Button
                     size="xl"
-                    className="bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                    className="bg-background text-foreground hover:bg-background/90 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                   >
                     Get Started Now
                     <ArrowRight className="h-5 w-5" />

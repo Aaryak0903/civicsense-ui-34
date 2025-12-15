@@ -75,8 +75,8 @@ export default {
         "3xl": "calc(var(--radius) + 8px)",
       },
       fontFamily: {
-        sans: ["DM Sans", "system-ui", "sans-serif"],
-        display: ["Space Grotesk", "DM Sans", "system-ui", "sans-serif"],
+        sans: ["Sora", "system-ui", "sans-serif"],
+        display: ["Outfit", "Sora", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -100,8 +100,8 @@ export default {
           to: { opacity: "1", transform: "translateX(0)" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 40px hsl(270 90% 65% / 0.3)" },
-          "50%": { boxShadow: "0 0 60px hsl(270 90% 65% / 0.5), 0 0 80px hsl(180 70% 50% / 0.3)" },
+          "0%, 100%": { boxShadow: "0 0 40px hsl(175 70% 45% / 0.25)" },
+          "50%": { boxShadow: "0 0 60px hsl(175 70% 45% / 0.4), 0 0 80px hsl(38 95% 55% / 0.2)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
