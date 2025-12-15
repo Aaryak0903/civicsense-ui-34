@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Zap, Sparkles } from "lucide-react";
+import { Menu, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 const navLinks = [
@@ -9,6 +9,42 @@ const navLinks = [
   { href: "/login", label: "Login" },
   { href: "/signup", label: "Sign Up" },
 ];
+
+// Custom CivicSense Logo Component
+function CivicSenseLogo() {
+  return (
+    <div className="relative flex h-12 w-12 items-center justify-center">
+      {/* Outer ring with gradient */}
+      <svg viewBox="0 0 48 48" className="absolute inset-0 w-full h-full">
+        <defs>
+          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="hsl(175 70% 45%)" />
+            <stop offset="100%" stopColor="hsl(38 95% 55%)" />
+          </linearGradient>
+        </defs>
+        {/* Hexagonal city shape */}
+        <path
+          d="M24 4 L42 14 L42 34 L24 44 L6 34 L6 14 Z"
+          fill="url(#logoGradient)"
+          className="drop-shadow-lg"
+        />
+        {/* Inner building silhouette */}
+        <g fill="hsl(220 25% 6%)">
+          <rect x="14" y="22" width="6" height="14" rx="1" />
+          <rect x="21" y="18" width="6" height="18" rx="1" />
+          <rect x="28" y="24" width="6" height="12" rx="1" />
+          {/* Network dots */}
+          <circle cx="17" cy="16" r="2" fill="hsl(38 95% 55%)" />
+          <circle cx="24" cy="12" r="2" fill="hsl(175 70% 55%)" />
+          <circle cx="31" cy="16" r="2" fill="hsl(38 95% 55%)" />
+          {/* Connection lines */}
+          <line x1="17" y1="16" x2="24" y2="12" stroke="hsl(175 70% 55%)" strokeWidth="1" opacity="0.6" />
+          <line x1="24" y1="12" x2="31" y2="16" stroke="hsl(175 70% 55%)" strokeWidth="1" opacity="0.6" />
+        </g>
+      </svg>
+    </div>
+  );
+}
 
 export function PublicNavbar() {
   const location = useLocation();
@@ -19,13 +55,15 @@ export function PublicNavbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-20 items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-hero shadow-lg shadow-primary/30 group-hover:shadow-glow-sm transition-shadow duration-300">
-              <Zap className="h-6 w-6 text-primary-foreground" />
-              <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-secondary animate-pulse" />
+            <CivicSenseLogo />
+            <div className="flex flex-col">
+              <span className="font-display text-xl font-bold text-gradient leading-tight">
+                CivicSense
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                Smart City Platform
+              </span>
             </div>
-            <span className="font-display text-2xl font-bold text-gradient">
-              CivicSense
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
