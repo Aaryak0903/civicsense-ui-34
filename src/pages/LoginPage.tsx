@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Eye, EyeOff } from "lucide-react";
+import { Zap, Eye, EyeOff, LogIn, User, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 
@@ -65,38 +65,44 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <PublicNavbar />
 
-      <main className="flex-1 flex items-center justify-center py-12 px-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl gradient-hero mb-4">
-              <Shield className="h-7 w-7 text-primary-foreground" />
+      <main className="flex-1 flex items-center justify-center py-16 px-4 relative">
+        {/* Background effects */}
+        <div className="absolute inset-0 gradient-mesh" />
+        <div className="floating-orb orb-primary w-[400px] h-[400px] -top-32 -left-32" />
+        <div className="floating-orb orb-secondary w-[300px] h-[300px] bottom-0 -right-20" style={{ animationDelay: '-7s' }} />
+
+        <div className="w-full max-w-md relative z-10 animate-slide-up">
+          <div className="text-center mb-10">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl gradient-hero shadow-glow mb-6">
+              <Zap className="h-8 w-8 text-primary-foreground" />
             </div>
-            <h1 className="font-display text-2xl font-bold text-foreground">
+            <h1 className="font-display text-3xl font-bold text-foreground mb-2">
               Welcome back
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground">
               Login to your CivicSense account
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5 bg-card p-8 rounded-2xl shadow-card border border-border/50">
+          <form onSubmit={handleSubmit} className="space-y-6 glass-card p-8">
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-foreground">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="john@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="h-12 bg-muted/50 border-border/50 focus:border-primary"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-foreground">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -104,47 +110,59 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="h-12 bg-muted/50 border-border/50 focus:border-primary pr-12"
                   required
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  className="absolute right-1 top-1 h-10 w-10 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    <EyeOff className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <Eye className="h-4 w-4 text-muted-foreground" />
+                    <Eye className="h-5 w-5 text-muted-foreground" />
                   )}
                 </Button>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Login as</Label>
+              <Label htmlFor="role" className="text-foreground">Login as</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) => setFormData({ ...formData, role: value })}
               >
-                <SelectTrigger id="role">
+                <SelectTrigger id="role" className="h-12 bg-muted/50 border-border/50">
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="citizen">Citizen</SelectItem>
-                  <SelectItem value="government_officer">Government Officer</SelectItem>
+                <SelectContent className="glass-effect">
+                  <SelectItem value="citizen">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Citizen
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="officer">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Government Officer
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" size="lg" disabled={isLoading}>
-              {isLoading ? "Logging in..." : "Login"}
+            <Button type="submit" variant="hero" className="w-full" size="lg">
+              <LogIn className="h-5 w-5" />
+              Login
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-primary font-medium hover:underline">
+              <Link to="/signup" className="text-primary font-semibold hover:underline">
                 Sign up
               </Link>
             </p>

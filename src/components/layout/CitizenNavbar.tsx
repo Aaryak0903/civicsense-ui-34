@@ -8,7 +8,8 @@ import {
   LogOut,
   Menu,
   X,
-  Shield,
+  Zap,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -34,42 +35,45 @@ export function CitizenNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 glass-effect border-b border-border/50">
+      <header className="sticky top-0 z-50 glass-effect">
         <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            <Link to="/citizen/dashboard" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
-                <Shield className="h-5 w-5 text-primary-foreground" />
+          <div className="flex h-20 items-center justify-between">
+            <Link to="/citizen/dashboard" className="flex items-center gap-3 group">
+              <div className="relative flex h-11 w-11 items-center justify-center rounded-xl gradient-hero shadow-lg shadow-primary/30 group-hover:shadow-glow-sm transition-shadow duration-300">
+                <Zap className="h-6 w-6 text-primary-foreground" />
+                <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-secondary animate-pulse" />
               </div>
-              <span className="font-display text-xl font-bold text-foreground">
+              <span className="font-display text-2xl font-bold text-gradient">
                 CivicSense
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-2">
               {navLinks.map((link) => {
                 const Icon = link.icon;
+                const isActive = location.pathname === link.href;
                 return (
                   <Link key={link.href} to={link.href}>
                     <Button
-                      variant={location.pathname === link.href ? "default" : "ghost"}
-                      size="sm"
+                      variant={isActive ? "glow" : "ghost"}
+                      size="default"
                       className="gap-2"
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
                       {link.label}
+                      {isActive && <Sparkles className="h-3 w-3 text-primary" />}
                     </Button>
                   </Link>
                 );
               })}
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={handleLogout}
-                className="ml-2 text-muted-foreground hover:text-destructive"
+                className="ml-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-5 w-5" />
               </Button>
             </nav>
 
@@ -80,7 +84,7 @@ export function CitizenNavbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className="md:hidden"
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
@@ -88,10 +92,11 @@ export function CitizenNavbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-x-0 top-16 z-40 glass-effect border-b border-border/50 animate-slide-up">
-          <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
+        <div className="md:hidden fixed inset-x-0 top-20 z-40 glass-effect border-b border-border/50 animate-slide-up">
+          <nav className="container mx-auto px-4 py-6 flex flex-col gap-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
+              const isActive = location.pathname === link.href;
               return (
                 <Link
                   key={link.href}
@@ -99,11 +104,13 @@ export function CitizenNavbar() {
                   onClick={() => setMobileOpen(false)}
                 >
                   <Button
-                    variant={location.pathname === link.href ? "default" : "ghost"}
-                    className="w-full justify-start gap-2"
+                    variant={isActive ? "glow" : "ghost"}
+                    className="w-full justify-start gap-3 h-12"
+                    size="lg"
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
                     {link.label}
+                    {isActive && <Sparkles className="h-3 w-3 ml-auto text-primary" />}
                   </Button>
                 </Link>
               );
@@ -111,9 +118,10 @@ export function CitizenNavbar() {
             <Button
               variant="ghost"
               onClick={handleLogout}
-              className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+              className="w-full justify-start gap-3 h-12 text-muted-foreground hover:text-destructive hover:bg-destructive/10 mt-2"
+              size="lg"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-5 w-5" />
               Logout
             </Button>
           </nav>
