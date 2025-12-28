@@ -12,8 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Eye, EyeOff } from "lucide-react";
+import { Shield, Eye, EyeOff, MapPin, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -24,14 +25,74 @@ export default function SignupPage() {
     name: "",
     email: "",
     phone: "",
-    role: "",
+    role: "citizen",
     password: "",
     confirmPassword: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [location, setLocation] = useState<{
+    address: string;
+    coordinates: [number, number] | null;
+  }>({
+    address: "",
+    coordinates: null,
+  });
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signup } = useAuth();
+
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Error",
+        description: "Geolocation is not supported by your browser",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGettingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await res.json();
+
+          setLocation({
+            coordinates: [longitude, latitude],
+            address: data.display_name || `${latitude}, ${longitude}`,
+          });
+        } catch (error) {
+          setLocation({
+            coordinates: [longitude, latitude],
+            address: `${latitude}, ${longitude}`,
+          });
+        }
+
+        setIsGettingLocation(false);
+      },
+      (error) => {
+        console.error(error);
+        toast({
+          title: "Error",
+          description: "Unable to retrieve your location",
+          variant: "destructive",
+        });
+        setIsGettingLocation(false);
+      }
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Error",
@@ -41,12 +102,34 @@ export default function SignupPage() {
       return;
     }
 
-    toast({
-      title: "Account Created!",
-      description: "Welcome to CivicSense. You can now login.",
-    });
+    setIsLoading(true);
 
-    navigate("/login");
+    try {
+      await signup({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+        location: formData.role === 'government_officer' ? location : undefined,
+        password: formData.password,
+      });
+
+      toast({
+        title: "Account Created!",
+        description: "Welcome to CivicSense. You can now login.",
+      });
+
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Signup Failed",
+        description: "Something went wrong during signup.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -115,10 +198,44 @@ export default function SignupPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="citizen">Citizen</SelectItem>
-                  <SelectItem value="officer">Government Officer</SelectItem>
+                  <SelectItem value="government_officer">Government Officer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {formData.role === "government_officer" && (
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="location"
+                    placeholder="Enter your assigned location"
+                    value={location.address}
+                    onChange={(e) =>
+                      setLocation({ ...location, address: e.target.value })
+                    }
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={getLocation}
+                    disabled={isGettingLocation}
+                    title="Get Current Location"
+                  >
+                    {isGettingLocation ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <MapPin className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Gov. Officers must provide their assigned operating location.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -174,8 +291,8 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" size="lg">
-              Create Account
+            <Button type="submit" variant="hero" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">

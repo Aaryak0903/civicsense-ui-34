@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CitizenNavbar } from "@/components/layout/CitizenNavbar";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, MapPin, X, Send } from "lucide-react";
+import { Upload, MapPin, X, Send, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { issueService } from "@/services/issueService";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 const categories = [
   "Pothole",
@@ -25,6 +28,7 @@ const categories = [
   "Drainage",
   "Traffic Signal",
   "Other",
+  "Road" // Added to match earlier usage if needed
 ];
 
 export default function ReportIssuePage() {
@@ -49,15 +53,111 @@ export default function ReportIssuePage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+
+  const getCurrentLocation = () => {
+    setIsGettingLocation(true);
+    if (!navigator.geolocation) {
+      toast({
+        title: "Error",
+        description: "Geolocation is not supported by your browser",
+        variant: "destructive",
+      });
+      setIsGettingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setCoordinates([longitude, latitude]);
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          if (data && data.display_name) {
+            setFormData((prev) => ({ ...prev, location: data.display_name }));
+            toast({
+              title: "Location Detected",
+              description: "Address updated based on your current location.",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          toast({
+            title: "Address Lookup Failed",
+            description: "Could not fetch address details. Please enter manually.",
+            variant: "default",
+          });
+        } finally {
+          setIsGettingLocation(false);
+        }
+      },
+      (error) => {
+        console.error("Error getting location", error);
+        toast({
+          title: "Location Access Denied",
+          description: "Please enable location services or enter address manually.",
+          variant: "destructive",
+        });
+        setIsGettingLocation(false);
+      }
+    );
+  };
+
+  // Get user location on mount (silent)
+  useEffect(() => {
+    getCurrentLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { data: nearbyIssuesData } = useQuery({
+    queryKey: ['nearbyIssues', coordinates],
+    queryFn: () => issueService.getNearbyIssues(coordinates![0], coordinates![1]),
+    enabled: !!coordinates,
+  });
+
+  const nearbyIssues = nearbyIssuesData?.data || [];
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    toast({
-      title: "Issue Reported!",
-      description: "Your issue has been submitted successfully. We'll analyze it shortly.",
-    });
+    try {
+      const payload = {
+        text: formData.title + "\n\n" + formData.description,
+        imageLink: imagePreview || "", // Send data URL or empty string
+        location: {
+          coordinates: coordinates || [0, 0], // Fallback if no location
+          address: formData.location
+        },
+        category: formData.category,
+        region: "Bangalore" // Default region as form doesn't have it
+      };
 
-    navigate("/citizen/dashboard");
+      await issueService.createIssue(payload);
+
+      toast({
+        title: "Issue Reported!",
+        description: "Your issue has been submitted successfully.",
+      });
+
+      navigate("/citizen/dashboard");
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Submission Failed",
+        description: "Could not report issue. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,6 +173,30 @@ export default function ReportIssuePage() {
             Help improve your community by reporting civic problems
           </p>
         </div>
+
+        {nearbyIssues.length > 0 && (
+          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-amber-800 dark:text-amber-400 mb-1">
+                  Similar Issues Nearby
+                </h3>
+                <p className="text-sm text-amber-700 dark:text-amber-500 mb-3">
+                  We found {nearbyIssues.length} issues reported near your location. Please check if your issue is already listed.
+                </p>
+                <ul className="space-y-2">
+                  {nearbyIssues.slice(0, 3).map((issue: any) => (
+                    <li key={issue._id} className="text-sm bg-background/50 p-2 rounded border border-amber-100 dark:border-amber-900/50">
+                      <span className="font-medium">{issue.category}</span>: {issue.text.substring(0, 60)}...
+                      <Link to={`/citizen/issues/${issue._id}`} className="text-primary hover:underline ml-2 text-xs">View</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form
           onSubmit={handleSubmit}
@@ -125,7 +249,24 @@ export default function ReportIssuePage() {
 
           {/* Location */}
           <div className="space-y-2">
-            <Label htmlFor="location">Location *</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="location">Location *</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 text-xs text-muted-foreground hover:text-primary px-2"
+                onClick={getCurrentLocation}
+                disabled={isGettingLocation}
+              >
+                {isGettingLocation ? (
+                  <span className="animate-spin mr-1">⏳</span>
+                ) : (
+                  <MapPin className="h-3 w-3 mr-1" />
+                )}
+                Use Current Location
+              </Button>
+            </div>
             <div className="relative">
               <Input
                 id="location"
@@ -135,7 +276,11 @@ export default function ReportIssuePage() {
                 className="pr-10"
                 required
               />
-              <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <MapPin
+                className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-primary transition-colors ${isGettingLocation ? "animate-pulse" : ""
+                  }`}
+                onClick={getCurrentLocation}
+              />
             </div>
           </div>
 

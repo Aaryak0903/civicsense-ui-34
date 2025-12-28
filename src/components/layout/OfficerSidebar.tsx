@@ -14,12 +14,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 const sidebarLinks = [
   { href: "/officer/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/officer/issues", label: "Issues", icon: FileText },
   { href: "/officer/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/officer/policy", label: "Policy", icon: FileCheck },
+  // { href: "/officer/policy", label: "Policy", icon: FileCheck }, // Removed as no API available
   { href: "/officer/settings", label: "Settings", icon: Settings },
 ];
 
@@ -28,8 +29,10 @@ export function OfficerSidebar() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { logout } = useAuth();
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 

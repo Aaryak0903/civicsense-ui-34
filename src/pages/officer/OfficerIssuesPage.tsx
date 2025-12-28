@@ -1,3 +1,4 @@
+
 import { OfficerSidebar } from "@/components/layout/OfficerSidebar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
@@ -20,93 +21,31 @@ import {
 import { Search, Eye, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-
-const issuesData = [
-  {
-    id: "ISS-001",
-    citizen: "John Smith",
-    title: "Large pothole on Main Street",
-    category: "Pothole",
-    severity: "high" as const,
-    status: "pending" as const,
-    region: "Downtown",
-    date: "2024-01-15",
-  },
-  {
-    id: "ISS-002",
-    citizen: "Sarah Johnson",
-    title: "Street light not working",
-    category: "Street Light",
-    severity: "medium" as const,
-    status: "in-progress" as const,
-    region: "Suburb East",
-    date: "2024-01-14",
-  },
-  {
-    id: "ISS-003",
-    citizen: "Mike Brown",
-    title: "Garbage pile near community park",
-    category: "Garbage",
-    severity: "low" as const,
-    status: "resolved" as const,
-    region: "North District",
-    date: "2024-01-13",
-  },
-  {
-    id: "ISS-004",
-    citizen: "Emily Davis",
-    title: "Water leakage flooding street",
-    category: "Water Leakage",
-    severity: "high" as const,
-    status: "pending" as const,
-    region: "Downtown",
-    date: "2024-01-12",
-  },
-  {
-    id: "ISS-005",
-    citizen: "Robert Wilson",
-    title: "Clogged drainage causing flooding",
-    category: "Drainage",
-    severity: "medium" as const,
-    status: "in-progress" as const,
-    region: "Industrial Zone",
-    date: "2024-01-11",
-  },
-  {
-    id: "ISS-006",
-    citizen: "Lisa Martinez",
-    title: "Broken bench in central park",
-    category: "Public Property",
-    severity: "low" as const,
-    status: "pending" as const,
-    region: "North District",
-    date: "2024-01-10",
-  },
-  {
-    id: "ISS-007",
-    citizen: "David Lee",
-    title: "Traffic signal malfunction",
-    category: "Traffic Signal",
-    severity: "high" as const,
-    status: "in-progress" as const,
-    region: "Suburb East",
-    date: "2024-01-09",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { issueService } from "@/services/issueService";
+import { Issue } from "@/types";
 
 export default function OfficerIssuesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [filterSeverity, setFilterSeverity] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
 
-  const filteredIssues = issuesData.filter((issue) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['issues', 'all'],
+    queryFn: () => issueService.getAllIssues({ limit: 100 }), // Get more issues for the list
+  });
+
+  const issues = data?.data || [];
+
+  const filteredIssues = issues.filter((issue: Issue) => {
     const matchesSearch =
-      issue.citizen.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSeverity = filterSeverity === "all" || issue.severity === filterSeverity;
+      (issue.reportedBy?.name || "Unknown").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      issue.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      issue._id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesPriority = filterPriority === "all" || (issue.priority || 'medium') === filterPriority; // API might not always return priority
     const matchesStatus = filterStatus === "all" || issue.status === filterStatus;
-    return matchesSearch && matchesSeverity && matchesStatus;
+
+    return matchesSearch && matchesPriority && matchesStatus;
   });
 
   return (
@@ -136,12 +75,12 @@ export default function OfficerIssuesPage() {
                   className="pl-10"
                 />
               </div>
-              <Select value={filterSeverity} onValueChange={setFilterSeverity}>
+              <Select value={filterPriority} onValueChange={setFilterPriority}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Severity" />
+                  <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Severity</SelectItem>
+                  <SelectItem value="all">All Priority</SelectItem>
                   <SelectItem value="high">High</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="low">Low</SelectItem>
@@ -153,9 +92,10 @@ export default function OfficerIssuesPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="open">Open</SelectItem>
                   <SelectItem value="in-progress">In Progress</SelectItem>
                   <SelectItem value="resolved">Resolved</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -164,64 +104,68 @@ export default function OfficerIssuesPage() {
           {/* Issues Table */}
           <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Citizen</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Severity</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredIssues.map((issue) => (
-                    <TableRow key={issue.id}>
-                      <TableCell className="font-medium text-primary">
-                        {issue.id}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {issue.title}
-                      </TableCell>
-                      <TableCell>{issue.citizen}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {issue.category}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={issue.severity} />
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={issue.status} />
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {issue.date}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Link to={`/officer/issues/${issue.id}`}>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          {issue.status === "pending" && (
-                            <Button variant="outline" size="sm" className="gap-1">
-                              <UserPlus className="h-3 w-3" />
-                              Assign
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
+              {isLoading ? (
+                <div className="p-8 text-center text-muted-foreground">Loading issues...</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Citizen</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredIssues.map((issue: Issue) => (
+                      <TableRow key={issue._id}>
+                        <TableCell className="font-medium text-primary">
+                          {issue._id.substring(0, 8)}...
+                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {issue.text.substring(0, 30)}...
+                        </TableCell>
+                        <TableCell>{issue.reportedBy?.name || "Unknown"}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {issue.category}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={issue.priority || 'medium'} />
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={issue.status} />
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(issue.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Link to={`/officer/issues/${issue._id}`}>
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            {issue.status === "open" && (
+                              <Button variant="outline" size="sm" className="gap-1">
+                                <UserPlus className="h-3 w-3" />
+                                Assign
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </div>
           </div>
 
-          {filteredIssues.length === 0 && (
+          {!isLoading && filteredIssues.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               No issues found matching your filters.
             </div>

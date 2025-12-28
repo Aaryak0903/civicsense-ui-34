@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Shield, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -24,19 +25,42 @@ export default function LoginPage() {
     password: "",
     role: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    toast({
-      title: "Welcome back!",
-      description: "Login successful.",
-    });
+    try {
+      const user = await login({
+        email: formData.email,
+        password: formData.password,
+      });
 
-    if (formData.role === "officer") {
-      navigate("/officer/dashboard");
-    } else {
-      navigate("/citizen/dashboard");
+      toast({
+        title: "Welcome back!",
+        description: "Login successful.",
+      });
+
+      // Determine navigation
+      const userRole = (user as any)?.role || formData.role;
+
+      if (userRole === "government_officer" || userRole === "officer") {
+        navigate("/officer/dashboard");
+      } else {
+        navigate("/citizen/dashboard");
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Login Failed",
+        description: "Invalid credentials or server error.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -109,13 +133,13 @@ export default function LoginPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="citizen">Citizen</SelectItem>
-                  <SelectItem value="officer">Government Officer</SelectItem>
+                  <SelectItem value="government_officer">Government Officer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" size="lg">
-              Login
+            <Button type="submit" variant="hero" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">

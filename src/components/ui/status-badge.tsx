@@ -1,15 +1,19 @@
 import { cn } from "@/lib/utils";
 
-export type StatusType = "pending" | "in-progress" | "resolved" | "high" | "medium" | "low";
+export type StatusType = "pending" | "in-progress" | "resolved" | "high" | "medium" | "low" | "open" | "closed";
 
 interface StatusBadgeProps {
-  status: StatusType;
+  status: StatusType | string; // Allow string to support API values loosely, but config handles known ones
   className?: string;
 }
 
-const statusConfig: Record<StatusType, { label: string; className: string }> = {
+const statusConfig: Record<string, { label: string; className: string }> = {
   pending: {
     label: "Pending",
+    className: "bg-amber-100 text-amber-700 border-amber-200",
+  },
+  open: {
+    label: "Open",
     className: "bg-amber-100 text-amber-700 border-amber-200",
   },
   "in-progress": {
@@ -19,6 +23,10 @@ const statusConfig: Record<StatusType, { label: string; className: string }> = {
   resolved: {
     label: "Resolved",
     className: "bg-secondary/10 text-secondary border-secondary/20",
+  },
+  closed: {
+    label: "Closed",
+    className: "bg-slate-100 text-slate-700 border-slate-200",
   },
   high: {
     label: "High",
@@ -35,8 +43,8 @@ const statusConfig: Record<StatusType, { label: string; className: string }> = {
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status];
-  
+  const config = statusConfig[status] || statusConfig['pending']; // Fallback
+
   return (
     <span
       className={cn(

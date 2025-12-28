@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { href: "/citizen/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,8 +25,10 @@ export function CitizenNavbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { logout } = useAuth();
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 

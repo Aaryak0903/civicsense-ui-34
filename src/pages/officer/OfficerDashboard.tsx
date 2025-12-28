@@ -29,74 +29,39 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-
-const issuesData = [
-  {
-    id: "ISS-001",
-    citizen: "John Smith",
-    category: "Pothole",
-    severity: "high" as const,
-    sentiment: "Negative",
-    status: "pending" as const,
-    region: "Downtown",
-  },
-  {
-    id: "ISS-002",
-    citizen: "Sarah Johnson",
-    category: "Street Light",
-    severity: "medium" as const,
-    sentiment: "Neutral",
-    status: "in-progress" as const,
-    region: "Suburb East",
-  },
-  {
-    id: "ISS-003",
-    citizen: "Mike Brown",
-    category: "Garbage",
-    severity: "low" as const,
-    sentiment: "Neutral",
-    status: "resolved" as const,
-    region: "North District",
-  },
-  {
-    id: "ISS-004",
-    citizen: "Emily Davis",
-    category: "Water Leakage",
-    severity: "high" as const,
-    sentiment: "Very Negative",
-    status: "pending" as const,
-    region: "Downtown",
-  },
-  {
-    id: "ISS-005",
-    citizen: "Robert Wilson",
-    category: "Drainage",
-    severity: "medium" as const,
-    sentiment: "Negative",
-    status: "in-progress" as const,
-    region: "Industrial Zone",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { issueService } from "@/services/issueService";
+import { Issue } from "@/types";
 
 export default function OfficerDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRegion, setFilterRegion] = useState("all");
-  const [filterSeverity, setFilterSeverity] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
 
-  const filteredIssues = issuesData.filter((issue) => {
-    const matchesSearch =
-      issue.citizen.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRegion = filterRegion === "all" || issue.region === filterRegion;
-    const matchesSeverity = filterSeverity === "all" || issue.severity === filterSeverity;
-    const matchesStatus = filterStatus === "all" || issue.status === filterStatus;
-    return matchesSearch && matchesRegion && matchesSeverity && matchesStatus;
+  const { data, isLoading } = useQuery({
+    queryKey: ['issues', 'officer'],
+    queryFn: () => issueService.getAllIssues({ limit: 100 }),
   });
 
-  const totalComplaints = issuesData.length;
-  const highPriority = issuesData.filter((i) => i.severity === "high").length;
-  const unassigned = issuesData.filter((i) => i.status === "pending").length;
+  const issues = data?.data || [];
+
+  const filteredIssues = issues.filter((issue: Issue) => {
+    const matchesSearch =
+      (issue.reportedBy?.name || "Unknown").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      issue.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRegion = filterRegion === "all" || issue.region === filterRegion;
+    const matchesPriority = filterPriority === "all" || (issue.priority || 'medium') === filterPriority; // API might not return priority always
+    const matchesStatus = filterStatus === "all" || issue.status === filterStatus;
+
+    return matchesSearch && matchesRegion && matchesPriority && matchesStatus;
+  });
+
+  const totalComplaints = issues.length;
+  const highPriority = issues.filter((i: Issue) => i.priority === "high").length;
+  const unassigned = issues.filter((i: Issue) => i.status === "open").length;
+  const resolvedCount = issues.filter((i: Issue) => i.status === "resolved" || i.status === "closed").length;
+  const resolutionRate = totalComplaints > 0 ? Math.round((resolvedCount / totalComplaints) * 100) : 0;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -121,7 +86,6 @@ export default function OfficerDashboard() {
               value={totalComplaints}
               icon={FileText}
               variant="primary"
-              trend={{ value: 8, isPositive: true }}
             />
             <StatCard
               title="High Priority"
@@ -137,10 +101,9 @@ export default function OfficerDashboard() {
             />
             <StatCard
               title="Resolution Rate"
-              value="94%"
+              value={`${resolutionRate}%`}
               icon={TrendingUp}
               variant="secondary"
-              trend={{ value: 5, isPositive: true }}
             />
           </div>
 
@@ -162,18 +125,17 @@ export default function OfficerDashboard() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Regions</SelectItem>
+                  <SelectItem value="Bangalore">Bangalore</SelectItem>
                   <SelectItem value="Downtown">Downtown</SelectItem>
-                  <SelectItem value="Suburb East">Suburb East</SelectItem>
-                  <SelectItem value="North District">North District</SelectItem>
-                  <SelectItem value="Industrial Zone">Industrial Zone</SelectItem>
+                  {/* Add more regions dynamically if possible */}
                 </SelectContent>
               </Select>
-              <Select value={filterSeverity} onValueChange={setFilterSeverity}>
+              <Select value={filterPriority} onValueChange={setFilterPriority}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Severity" />
+                  <SelectValue placeholder="Priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Severity</SelectItem>
+                  <SelectItem value="all">All Priority</SelectItem>
                   <SelectItem value="high">High</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="low">Low</SelectItem>
@@ -185,9 +147,10 @@ export default function OfficerDashboard() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="open">Open</SelectItem>
                   <SelectItem value="in-progress">In Progress</SelectItem>
                   <SelectItem value="resolved">Resolved</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -201,56 +164,56 @@ export default function OfficerDashboard() {
               </h2>
             </div>
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Citizen</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Severity</TableHead>
-                    <TableHead>Sentiment</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredIssues.map((issue) => (
-                    <TableRow key={issue.id}>
-                      <TableCell className="font-medium text-primary">
-                        {issue.id}
-                      </TableCell>
-                      <TableCell>{issue.citizen}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {issue.category}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={issue.severity} />
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {issue.sentiment}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={issue.status} />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Link to={`/officer/issues/${issue.id}`}>
-                            <Button variant="ghost" size="sm">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          {issue.status === "pending" && (
-                            <Button variant="outline" size="sm" className="gap-1">
-                              <UserPlus className="h-3 w-3" />
-                              Assign
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
+              {isLoading ? (
+                <div className="p-8 text-center text-muted-foreground">Loading complaints...</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Citizen</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredIssues.map((issue: Issue) => (
+                      <TableRow key={issue._id}>
+                        <TableCell className="font-medium text-primary">
+                          {issue._id.substring(0, 8)}...
+                        </TableCell>
+                        <TableCell>{issue.reportedBy?.name || "Anonymous"}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {issue.category}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={issue.priority || 'medium'} />
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={issue.status} />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Link to={`/officer/issues/${issue._id}`}>
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            {issue.status === "open" && (
+                              <Button variant="outline" size="sm" className="gap-1">
+                                <UserPlus className="h-3 w-3" />
+                                Assign
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </div>
           </div>
         </div>

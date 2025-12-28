@@ -6,9 +6,11 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CitizenSettings() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -16,6 +18,7 @@ export default function CitizenSettings() {
   });
 
   const handleSave = () => {
+    // Ideally this should update via API
     toast({
       title: "Settings Saved",
       description: "Your preferences have been updated.",
@@ -45,17 +48,18 @@ export default function CitizenSettings() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" defaultValue="John Smith" />
+                <Input id="name" defaultValue={user?.name || ""} disabled />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="john@example.com" />
+                <Input id="email" type="email" defaultValue={user?.email || ""} disabled />
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" />
+                <Input id="phone" type="tel" defaultValue={user?.phone || ""} disabled />
               </div>
             </div>
+            <p className="text-xs text-muted-foreground mt-4">Profile details are managed by the administration.</p>
           </div>
 
           {/* Notifications */}
