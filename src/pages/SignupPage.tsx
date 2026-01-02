@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Eye, EyeOff, MapPin, Loader2, Zap } from "lucide-react";
+import { Shield, Eye, EyeOff, MapPin, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import heroBg from "@/assets/landing-bg-user.jpg";
@@ -135,200 +135,210 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <PublicNavbar />
-
-      <main className="flex-1 flex items-center justify-center py-16 px-4 relative isolate overflow-hidden">
-        {/* Background Image with Rich Overlay */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed animate-pulse-slow opacity-20"
-          style={{ backgroundImage: `url(${heroBg})`, animationDuration: '30s' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/25 -z-10" />
-
-        {/* Animated Particles/Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-blob" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] animate-blob animation-delay-2000" />
-
-        <div className="w-full max-w-lg relative z-10 animate-slide-up">
-          <div className="glass-card shadow-2xl overflow-hidden backdrop-blur-3xl bg-card/30">
-            {/* Header Section */}
-            <div className="bg-gradient-to-r from-primary/95 to-secondary/95 p-8 text-center border-b border-white/10">
-              <div className="inline-flex h-20 w-auto items-center justify-center mb-2 bg-white/10 rounded-xl p-2 backdrop-blur-sm">
+    <div className="w-full h-screen lg:grid lg:grid-cols-2 overflow-hidden bg-background">
+      {/* Left Panel: Form */}
+      <div className="flex flex-col justify-center items-center p-6 md:p-12 overflow-y-auto">
+        <div className="w-full max-w-lg space-y-6 animate-slide-up">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center mb-6">
+              <Link to="/" className="inline-block transition-transform hover:scale-105">
                 <Logo className="h-16" scale="scale-100" />
+              </Link>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+              Create an account
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Join our community to start making a difference.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="h-11 bg-background"
+                  required
+                />
               </div>
-              <h1 className="font-display text-3xl font-bold text-white mb-2 tracking-tight">
-                Join NagrikSeva
-              </h1>
-              <p className="text-primary-foreground/80 font-medium">
-                Create your citizen account
-              </p>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="h-11 bg-background"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-foreground">Full Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="h-11 bg-background"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value) => setFormData({ ...formData, role: value })}
+              >
+                <SelectTrigger id="role" className="h-11 bg-background">
+                  <SelectValue placeholder="Select your role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="citizen">Citizen</SelectItem>
+                  <SelectItem value="officer">Government Officer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.role === "officer" && (
+              <div className="space-y-2 p-4 bg-muted/40 rounded-lg border border-border/50 animate-in fade-in zoom-in-95">
+                <Label htmlFor="location" className="text-xs font-semibold uppercase text-muted-foreground">Assigned Jurisdiction</Label>
+                <div className="flex gap-2">
                   <Input
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="h-12 bg-muted/50 border-border/50 focus:border-primary"
+                    id="location"
+                    placeholder="Search or detect location..."
+                    value={location.address}
+                    onChange={(e) =>
+                      setLocation({ ...location, address: e.target.value })
+                    }
+                    className="h-11 bg-background"
                     required
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="h-12 bg-muted/50 border-border/50 focus:border-primary"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-foreground">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+1 (555) 000-0000"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="h-12 bg-muted/50 border-border/50 focus:border-primary"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="text-foreground">Role</Label>
-                  <Select
-                    value={formData.role}
-                    onValueChange={(value) => setFormData({ ...formData, role: value })}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-11 w-11 shrink-0"
+                    onClick={getLocation}
+                    disabled={isGettingLocation}
+                    title="Get Current Location"
                   >
-                    <SelectTrigger id="role" className="h-12 bg-muted/50 border-border/50">
-                      <SelectValue placeholder="Select your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="citizen">Citizen</SelectItem>
-                      <SelectItem value="officer">Government Officer</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    {isGettingLocation ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <MapPin className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-
-                {formData.role === "officer" && (
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="location"
-                        placeholder="Enter your assigned location"
-                        value={location.address}
-                        onChange={(e) =>
-                          setLocation({ ...location, address: e.target.value })
-                        }
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={getLocation}
-                        disabled={isGettingLocation}
-                        title="Get Current Location"
-                      >
-                        {isGettingLocation ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <MapPin className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Gov. Officers must provide their assigned operating location.
-                    </p>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="h-12 bg-muted/50 border-border/50 focus:border-primary pr-12"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1 h-10 w-10 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      className="h-12 bg-muted/50 border-border/50 focus:border-primary pr-12"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1 h-10 w-10 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
-                  Create Account
-                </Button>
-
-                <p className="text-center text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link to="/login" className="text-primary font-semibold hover:underline">
-                    Login
-                  </Link>
+                <p className="text-[10px] text-muted-foreground">
+                  * Required for officer verification. Use the map pin for current GPS location.
                 </p>
-              </form>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="h-11 bg-background pr-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="h-11 bg-background pr-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 mt-4 font-medium text-base shadow-sm hover:shadow-md transition-all"
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating account..." : "Create Account"}
+            </Button>
+          </form>
+
+          <div className="text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary font-semibold hover:underline underline-offset-4">
+              Sign in
+            </Link>
+          </div>
+
+          <div className="pt-8 mt-8 border-t border-border/40 text-center text-xs text-muted-foreground">
+            <Link to="/" className="hover:text-foreground transition-colors">Back to Home</Link>
           </div>
         </div>
-      </main>
+      </div>
 
-      <Footer />
+      {/* Right Panel: Visual */}
+      <div className="hidden lg:block relative bg-muted">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroBg})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+
+        <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
+          <h2 className="text-4xl font-bold mb-4">Join the movement.</h2>
+          <p className="text-lg text-white/80 max-w-md leading-relaxed">
+            "A platform built for the people, by the people. Together we can build safer, smarter, and cleaner cities."
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

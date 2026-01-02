@@ -6,7 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Zap, Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import heroBg from "@/assets/landing-bg-user.jpg";
@@ -59,97 +59,113 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <PublicNavbar />
+    <div className="w-full h-screen lg:grid lg:grid-cols-2 overflow-hidden bg-background">
+      {/* Left Panel: Form */}
+      <div className="flex flex-col justify-center items-center p-6 md:p-12 overflow-y-auto">
+        <div className="w-full max-w-sm space-y-8 animate-slide-up">
+          <div className="text-center">
+            <Link to="/" className="inline-block mb-6 transition-transform hover:scale-105">
+              <Logo className="h-12" scale="scale-100" />
+            </Link>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+              Welcome back
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Enter your credentials to access your account.
+            </p>
+          </div>
 
-      <main className="flex-1 flex items-center justify-center py-16 px-4 relative isolate overflow-hidden">
-        {/* Background Image with Rich Overlay */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed animate-pulse-slow opacity-20"
-          style={{ backgroundImage: `url(${heroBg})`, animationDuration: '30s' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/25 -z-10" />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="h-11 bg-background"
+                required
+              />
+            </div>
 
-        {/* Animated Particles/Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-blob" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] animate-blob animation-delay-2000" />
-
-        <div className="w-full max-w-md relative z-10 animate-slide-up">
-          <div className="glass-card shadow-2xl overflow-hidden backdrop-blur-3xl bg-card/30">
-            {/* Header Section */}
-            <div className="bg-gradient-to-r from-primary/95 to-secondary/95 p-8 text-center border-b border-white/10">
-              <div className="inline-flex h-20 w-auto items-center justify-center mb-2 bg-white/10 rounded-xl p-2 backdrop-blur-sm">
-                <Logo className="h-16" scale="scale-100" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
               </div>
-              <h1 className="font-display text-3xl font-bold text-white mb-2 tracking-tight">
-                Welcome Back
-              </h1>
-              <p className="text-primary-foreground/80 font-medium">
-                Login to NagrikSeva
-              </p>
-            </div>
-
-            <div className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="h-12 bg-white/50 border-border focus:border-primary"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="h-12 bg-white/50 border-border focus:border-primary pr-12"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1 h-10 w-10 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" size="lg">
-                  <LogIn className="h-5 w-5 mr-2" />
-                  Login
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="h-11 bg-background pr-10"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-11 w-11 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
                 </Button>
-
-                <p className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <Link to="/signup" className="text-primary font-semibold hover:underline">
-                    Sign up
-                  </Link>
-                </p>
-              </form>
+              </div>
             </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 font-medium text-base shadow-sm hover:shadow-md transition-all"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+
+          <div className="text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-primary font-semibold hover:underline underline-offset-4">
+              Sign up
+            </Link>
+          </div>
+
+          <div className="pt-8 mt-8 border-t border-border/40 text-center text-xs text-muted-foreground">
+            <Link to="/" className="hover:text-foreground transition-colors">Back to Home</Link>
           </div>
         </div>
-      </main>
+      </div>
 
-      <Footer />
-    </div >
+      {/* Right Panel: Visual */}
+      <div className="hidden lg:block relative bg-muted">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroBg})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+
+        <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
+          <blockquote className="space-y-2">
+            <p className="text-2xl font-medium leading-relaxed">
+              "CivicSense has transformed how we interact with our local government. It's transparent, fast, and empowering."
+            </p>
+            <footer className="text-white/80 text-sm font-medium mt-4">
+              &mdash; Priya Sharma, Community Leader
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
   );
 }
