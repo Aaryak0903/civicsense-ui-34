@@ -16,7 +16,7 @@ import {
 import { Shield, Eye, EyeOff, MapPin, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import heroBg from "@/assets/landing-bg-user.jpg";
+
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -328,7 +328,7 @@ export default function SignupPage() {
       <div className="hidden lg:block relative bg-muted">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroBg})` }}
+          style={{ backgroundImage: `url(/aaru.jfif)` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
 

@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -151,7 +150,7 @@ export default function LoginPage() {
       <div className="hidden lg:block relative bg-muted">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroBg})` }}
+          style={{ backgroundImage: `url(/aaru.jfif)` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
 
