@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { Logo } from "@/components/layout/Logo";
 
 const sidebarLinks = [
   { href: "/officer/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -41,13 +42,10 @@ export function OfficerSidebar() {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 p-5 border-b border-sidebar-border">
-        <div className="relative flex h-10 w-10 items-center justify-center rounded-xl gradient-hero shadow-lg shadow-primary/30 shrink-0">
-          <Zap className="h-5 w-5 text-primary-foreground" />
-          <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-secondary animate-pulse" />
-        </div>
+        <Logo className="h-10 w-auto" scale="scale-100" />
         {(!collapsed || isMobile) && (
           <span className="font-display text-xl font-bold text-gradient">
-            CivicSense
+            NagrikSeva
           </span>
         )}
       </div>

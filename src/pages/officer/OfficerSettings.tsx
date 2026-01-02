@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function OfficerSettings() {
   const { toast } = useToast();
@@ -28,7 +29,14 @@ export default function OfficerSettings() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background relative isolate overflow-hidden">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+
       <OfficerSidebar />
 
       <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">

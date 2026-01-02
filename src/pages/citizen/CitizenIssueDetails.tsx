@@ -9,6 +9,7 @@ import { issueService } from "@/services/issueService";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function CitizenIssueDetails() {
   const { id } = useParams();
@@ -56,10 +57,17 @@ export default function CitizenIssueDetails() {
   if (!issue) return <div className="min-h-screen bg-background flex items-center justify-center">Issue not found</div>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dashboard relative isolate">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+
       <CitizenNavbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative">
         <Link to="/citizen/dashboard">
           <Button variant="ghost" className="mb-6 gap-2">
             <ArrowLeft className="h-4 w-4" />

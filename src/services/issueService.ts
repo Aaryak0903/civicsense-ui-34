@@ -32,4 +32,12 @@ export const issueService = {
         const response = await api.post<IssueResponse>(`/api/issues/${id}/comment`, { text });
         return response.data;
     },
+    getMyIssues: async (params?: any) => {
+        const response = await api.get<IssuesResponse>('/api/issues/my-issues', { params });
+        return response.data;
+    },
+    getOfficerDashboardIssues: async (params?: any) => {
+        const response = await api.get<IssuesResponse>('/api/issues/officer-dashboard', { params });
+        return response.data;
+    },
 };

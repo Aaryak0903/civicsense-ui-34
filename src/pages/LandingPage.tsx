@@ -2,7 +2,7 @@ import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroBg from "@/assets/landing-bg-user.jpg";
 import {
   Zap,
   FileText,
@@ -77,55 +77,48 @@ export default function LandingPage() {
       <PublicNavbar />
 
       {/* Hero Section with Background Image */}
-      <section className="relative min-h-[95vh] flex items-center">
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-[92vh] flex items-center justify-center">
         {/* Background Image */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${heroBg})` }}
         />
-        {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/60" />
-        
+        {/* Deep, premium gradient overlay to avoid white look */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-background/60 to-secondary/30" />
+        <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px]" />
+
         {/* Animated accent orbs */}
-        <div className="floating-orb orb-primary w-[400px] h-[400px] -top-20 -left-20" />
-        <div className="floating-orb orb-secondary w-[300px] h-[300px] top-40 -right-20" style={{ animationDelay: '-8s' }} />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect text-sm font-medium mb-8 animate-fade-in">
-              <Building2 className="h-4 w-4 text-secondary" />
-              <span className="text-foreground/90">AI-Powered Public Welfare System</span>
-            </div>
-            
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-6 animate-slide-up">
-              <span className="text-foreground">Your Voice.</span>
-              <br />
-              <span className="text-gradient">Your City.</span>
-              <br />
-              <span className="text-gradient-warm">Your Impact.</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-foreground/70 max-w-xl mb-10 animate-slide-up" style={{ animationDelay: "0.15s" }}>
-              CivicSense connects citizens directly with city officials. Report infrastructure issues, 
-              track progress in real-time, and watch your community transform.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: "0.3s" }}>
-              <Link to="/signup">
-                <Button variant="hero" size="xl" className="group w-full sm:w-auto">
-                  <MessageSquare className="h-5 w-5" />
-                  Report an Issue
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-              <Link to="/login">
-                <Button variant="outline-hero" size="xl" className="w-full sm:w-auto">
-                  <Shield className="h-5 w-5" />
-                  Officer Portal
-                </Button>
-              </Link>
-            </div>
+        <div className="floating-orb orb-primary w-[600px] h-[600px] -top-32 -left-32 opacity-20" />
+        <div className="floating-orb orb-secondary w-[500px] h-[500px] bottom-0 -right-20 opacity-20" style={{ animationDelay: '-8s' }} />
+
+        <div className="container mx-auto px-4 relative z-10 text-center flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full glass-effect border-primary/20 text-xs font-semibold mb-6 animate-fade-in shadow-xl bg-primary/10 backdrop-blur-md">
+            <Building2 className="h-3.5 w-3.5 text-primary" />
+            <span className="text-primary font-bold tracking-wide uppercase">Official Government Portal</span>
+          </div>
+
+          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-black leading-[1.15] mb-6 animate-slide-up max-w-4xl tracking-tight text-foreground drop-shadow-xl">
+            A platform where <br />
+            <span className="text-primary">
+              citizen concerns meet
+            </span>
+            <br />
+            <span className="text-foreground">government action</span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-12 animate-slide-up leading-relaxed" style={{ animationDelay: "0.15s" }}>
+            A digital bridge between citizens and authorities
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6 animate-slide-up items-center justify-center w-full" style={{ animationDelay: "0.3s" }}>
+            <Link to="/signup" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-base rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-primary text-primary-foreground border-0">
+                <MessageSquare className="h-5 w-5 mr-3" />
+                Get Started
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -136,8 +129,8 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="text-center group animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
@@ -168,7 +161,7 @@ export default function LandingPage() {
               Three simple steps to make your city better
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {steps.map((step, index) => (
               <div
@@ -180,17 +173,17 @@ export default function LandingPage() {
                 {index < steps.length - 1 && (
                   <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-[2px] bg-gradient-to-r from-primary/40 to-transparent" />
                 )}
-                
+
                 <div className="relative p-8 rounded-3xl glass-card hover:shadow-glow transition-all duration-500 group-hover:-translate-y-2">
                   {/* Step number */}
                   <div className="absolute -top-4 -right-4 h-10 w-10 rounded-full gradient-hero flex items-center justify-center text-primary-foreground font-bold shadow-lg">
                     {index + 1}
                   </div>
-                  
+
                   <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     <step.icon className="h-8 w-8 text-white" />
                   </div>
-                  
+
                   <h3 className="font-display text-2xl font-bold text-foreground mb-3">
                     {step.title}
                   </h3>
@@ -217,7 +210,7 @@ export default function LandingPage() {
               Built with cutting-edge technology for maximum efficiency
             </p>
           </div>
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {features.map((feature, index) => (
               <div
@@ -244,19 +237,19 @@ export default function LandingPage() {
           <div className="relative max-w-5xl mx-auto">
             {/* Glow effect */}
             <div className="absolute inset-0 gradient-hero rounded-[2.5rem] blur-3xl opacity-15" />
-            
+
             <div className="relative p-12 md:p-16 rounded-[2.5rem] gradient-hero overflow-hidden">
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-              
+
               <div className="relative text-center">
                 <Users className="h-14 w-14 text-white/80 mx-auto mb-8" />
                 <h2 className="font-display text-3xl md:text-5xl font-bold text-white mb-6">
                   Join Thousands of Active Citizens
                 </h2>
                 <p className="text-white/80 max-w-2xl mx-auto mb-10 text-lg">
-                  Be part of the change. Report issues in your neighborhood and help 
+                  Be part of the change. Report issues in your neighborhood and help
                   create a cleaner, safer, and more efficient city for everyone.
                 </p>
                 <Link to="/signup">

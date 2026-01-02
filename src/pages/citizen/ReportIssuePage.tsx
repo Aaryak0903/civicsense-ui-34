@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { issueService } from "@/services/issueService";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 const categories = [
   "Pothole",
@@ -161,10 +162,17 @@ export default function ReportIssuePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dashboard relative isolate">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+
       <CitizenNavbar />
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <main className="container mx-auto px-4 py-8 max-w-2xl relative">
         <div className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
             Report an Issue
@@ -198,137 +206,137 @@ export default function ReportIssuePage() {
           </div>
         )}
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 bg-card p-6 md:p-8 rounded-2xl shadow-card border border-border/50"
-        >
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Issue Title *</Label>
-            <Input
-              id="title"
-              placeholder="e.g., Large pothole causing traffic issues"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
-            />
+        <div className="bg-card rounded-none md:rounded-xl shadow-2xl border-y md:border border-border overflow-hidden max-w-lg mx-auto">
+          <div className="bg-primary/5 p-6 border-b border-border/50 text-center">
+            <h2 className="font-display text-xl font-bold text-foreground">Report Issue Details</h2>
+            <p className="text-xs text-muted-foreground mt-1">Please provide accurate information</p>
           </div>
 
-          {/* Category */}
-          <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
-            >
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Select issue category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category.toLowerCase()}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              placeholder="Please provide detailed information about the issue..."
-              rows={4}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              required
-            />
-          </div>
-
-          {/* Location */}
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="location">Location *</Label>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 text-xs text-muted-foreground hover:text-primary px-2"
-                onClick={getCurrentLocation}
-                disabled={isGettingLocation}
-              >
-                {isGettingLocation ? (
-                  <span className="animate-spin mr-1">⏳</span>
-                ) : (
-                  <MapPin className="h-3 w-3 mr-1" />
-                )}
-                Use Current Location
-              </Button>
-            </div>
-            <div className="relative">
+          <form
+            onSubmit={handleSubmit}
+            className="p-6 md:p-8 space-y-5"
+          >
+            {/* Title */}
+            <div className="space-y-1.5">
+              <Label htmlFor="title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Issue Title</Label>
               <Input
-                id="location"
-                placeholder="Enter the address or landmark"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="pr-10"
+                id="title"
+                placeholder="Brief title of the issue"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="bg-background"
                 required
               />
-              <MapPin
-                className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-primary transition-colors ${isGettingLocation ? "animate-pulse" : ""
-                  }`}
-                onClick={getCurrentLocation}
+            </div>
+
+            {/* Category */}
+            <div className="space-y-1.5">
+              <Label htmlFor="category" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
+              >
+                <SelectTrigger id="category" className="bg-background">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category.toLowerCase()}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1.5">
+              <Label htmlFor="description" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Detailed description..."
+                rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="bg-background resize-none"
+                required
               />
             </div>
-          </div>
 
-          {/* Image Upload */}
-          <div className="space-y-2">
-            <Label>Upload Image (Optional)</Label>
-            {imagePreview ? (
-              <div className="relative rounded-xl overflow-hidden border border-border">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover"
-                />
+            {/* Location */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="location" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Location</Label>
                 <Button
                   type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2"
-                  onClick={() => setImagePreview(null)}
+                  variant="link"
+                  size="sm"
+                  className="h-auto p-0 text-xs text-primary"
+                  onClick={getCurrentLocation}
+                  disabled={isGettingLocation}
                 >
-                  <X className="h-4 w-4" />
+                  {isGettingLocation ? "Detecting..." : "Detect Location"}
                 </Button>
               </div>
-            ) : (
-              <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
-                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                <span className="text-sm text-muted-foreground">
-                  Click to upload or drag and drop
-                </span>
-                <span className="text-xs text-muted-foreground mt-1">
-                  PNG, JPG up to 10MB
-                </span>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageChange}
+              <div className="relative">
+                <Input
+                  id="location"
+                  placeholder="Address"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="pr-10 bg-background"
+                  required
                 />
-              </label>
-            )}
-          </div>
+                <MapPin
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                />
+              </div>
+            </div>
 
-          {/* Submit */}
-          <Button type="submit" variant="hero" size="lg" className="w-full gap-2">
-            <Send className="h-4 w-4" />
-            Submit Report
-          </Button>
-        </form>
+            {/* Image Upload */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Evidence</Label>
+              {imagePreview ? (
+                <div className="relative rounded-lg overflow-hidden border border-border mt-1 group">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setImagePreview(null)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors mt-1 bg-background">
+                  <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                  <span className="text-xs text-muted-foreground">
+                    Upload Photo
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </label>
+              )}
+            </div>
+
+            {/* Submit */}
+            <Button type="submit" variant="hero" size="lg" className="w-full gap-2 mt-4 rounded-lg">
+              <Send className="h-4 w-4" />
+              Submit Issue
+            </Button>
+          </form>
+        </div>
       </main>
     </div>
   );

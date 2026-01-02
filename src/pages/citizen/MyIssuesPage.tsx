@@ -24,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { issueService } from "@/services/issueService";
 import { useAuth } from "@/context/AuthContext";
 import { Issue } from "@/types";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function MyIssuesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,12 +32,11 @@ export default function MyIssuesPage() {
   const { user } = useAuth();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['issues'],
-    queryFn: () => issueService.getAllIssues(),
+    queryKey: ['issues', 'my'],
+    queryFn: () => issueService.getMyIssues({ limit: 100 }),
   });
 
-  const issues = data?.data || [];
-  const myIssues = issues.filter((issue: Issue) => issue.reportedBy?._id === user?._id);
+  const myIssues = data?.data || [];
 
   const filteredIssues = myIssues.filter((issue: Issue) => {
     const matchesSearch =
@@ -47,10 +47,17 @@ export default function MyIssuesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dashboard relative isolate">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+
       <CitizenNavbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">

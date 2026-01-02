@@ -25,6 +25,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { issueService } from "@/services/issueService";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 const officers = [
   { id: "1", name: "Officer James Miller" },
@@ -81,7 +82,14 @@ export default function IssueDetailsPage() {
   if (!issue) return <div className="flex min-h-screen bg-background items-center justify-center">Issue not found</div>;
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-dashboard relative isolate overflow-hidden">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+
       <OfficerSidebar />
 
       <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">

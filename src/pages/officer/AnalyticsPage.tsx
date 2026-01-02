@@ -11,6 +11,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { issueService } from "@/services/issueService";
 import { Issue } from "@/types";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function AnalyticsPage() {
   const { data, isLoading } = useQuery({
@@ -69,7 +70,14 @@ export default function AnalyticsPage() {
   });
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-dashboard relative isolate overflow-hidden">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-30"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/30 -z-10" />
+
       <OfficerSidebar />
 
       <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">

@@ -26,45 +26,76 @@ import {
   Search,
   Eye,
   UserPlus,
+  Clock,
+  CheckCircle2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { issueService } from "@/services/issueService";
+import { useAuth } from "@/context/AuthContext";
 import { Issue } from "@/types";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function OfficerDashboard() {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRegion, setFilterRegion] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
 
   const { data, isLoading } = useQuery({
-    queryKey: ['issues', 'officer'],
-    queryFn: () => issueService.getAllIssues({ limit: 100 }),
+    queryKey: ['issues', 'officer', filterStatus],
+    queryFn: () => issueService.getOfficerDashboardIssues({
+      status: filterStatus === 'all' ? undefined : filterStatus,
+      limit: 100
+    }),
   });
 
   const issues = data?.data || [];
 
-  const filteredIssues = issues.filter((issue: Issue) => {
-    const matchesSearch =
-      (issue.reportedBy?.name || "Unknown").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      issue.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRegion = filterRegion === "all" || issue.region === filterRegion;
-    const matchesPriority = filterPriority === "all" || (issue.priority || 'medium') === filterPriority; // API might not return priority always
-    const matchesStatus = filterStatus === "all" || issue.status === filterStatus;
+  // Filter and Sort Issues
+  const filteredIssues = issues
+    .filter((issue: Issue) => {
+      // 1. Search filter
+      const matchesSearch =
+        (issue.reportedBy?.name || "Unknown").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        issue.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        issue.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        issue._id.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesSearch && matchesRegion && matchesPriority && matchesStatus;
-  });
+      // 2. Priority filter
+      const matchesPriority = filterPriority === "all" || (issue.priority || 'medium').toLowerCase() === filterPriority;
+
+      // 3. Location filter (Officer Location == Issue Location/Region)
+      const officerLocation = user?.location?.address?.toLowerCase() || "";
+      const issueLocation = issue.location?.address?.toLowerCase() || "";
+      const issueRegion = issue.region?.toLowerCase() || "";
+
+      // Check if officer location matches issue region or issue address contains officer location keywords
+      const matchesLocation = !officerLocation ||
+        issueRegion.includes(officerLocation) ||
+        officerLocation.includes(issueRegion) ||
+        issueLocation.includes(officerLocation);
+
+      return matchesSearch && matchesPriority && matchesLocation;
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); // Sort by newest first
 
   const totalComplaints = issues.length;
-  const highPriority = issues.filter((i: Issue) => i.priority === "high").length;
-  const unassigned = issues.filter((i: Issue) => i.status === "open").length;
+  const highPriority = issues.filter((i: Issue) => (i.priority || "medium").toLowerCase() === "high").length;
   const resolvedCount = issues.filter((i: Issue) => i.status === "resolved" || i.status === "closed").length;
-  const resolutionRate = totalComplaints > 0 ? Math.round((resolvedCount / totalComplaints) * 100) : 0;
+  const pendingCount = totalComplaints - resolvedCount;
+  const inProgressCount = issues.filter((i: Issue) => i.status === "in-progress").length;
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-dashboard overflow-hidden">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-40 mix-blend-soft-light"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background to-secondary/35 -z-10" />
+
       <OfficerSidebar />
 
       <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">
@@ -82,28 +113,28 @@ export default function OfficerDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <StatCard
-              title="Total Complaints"
-              value={totalComplaints}
-              icon={FileText}
+              title="Issues Solved"
+              value={resolvedCount}
+              icon={CheckCircle2}
               variant="primary"
+            />
+            <StatCard
+              title="Issues Pending"
+              value={pendingCount}
+              icon={Clock}
+              variant="secondary"
             />
             <StatCard
               title="High Priority"
               value={highPriority}
               icon={AlertTriangle}
-              variant="default"
-            />
-            <StatCard
-              title="Unassigned"
-              value={unassigned}
-              icon={UserX}
               variant="accent"
             />
             <StatCard
-              title="Resolution Rate"
-              value={`${resolutionRate}%`}
+              title="In Progress"
+              value={inProgressCount}
               icon={TrendingUp}
-              variant="secondary"
+              variant="default"
             />
           </div>
 
@@ -113,23 +144,13 @@ export default function OfficerDashboard() {
               <div className="lg:col-span-2 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by citizen or category..."
+                  placeholder="Search by description or ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              <Select value={filterRegion} onValueChange={setFilterRegion}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Region" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Regions</SelectItem>
-                  <SelectItem value="Bangalore">Bangalore</SelectItem>
-                  <SelectItem value="Downtown">Downtown</SelectItem>
-                  {/* Add more regions dynamically if possible */}
-                </SelectContent>
-              </Select>
+
               <Select value={filterPriority} onValueChange={setFilterPriority}>
                 <SelectTrigger>
                   <SelectValue placeholder="Priority" />
@@ -156,65 +177,85 @@ export default function OfficerDashboard() {
             </div>
           </div>
 
-          {/* Issues Table */}
-          <div className="bg-card rounded-xl shadow-card border border-border/50 overflow-hidden">
-            <div className="p-6 border-b border-border">
-              <h2 className="font-display text-lg font-semibold text-foreground">
-                Incoming Complaints
-              </h2>
-            </div>
-            <div className="overflow-x-auto">
-              {isLoading ? (
-                <div className="p-8 text-center text-muted-foreground">Loading complaints...</div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Citizen</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Priority</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredIssues.map((issue: Issue) => (
-                      <TableRow key={issue._id}>
-                        <TableCell className="font-medium text-primary">
-                          {issue._id.substring(0, 8)}...
-                        </TableCell>
-                        <TableCell>{issue.reportedBy?.name || "Anonymous"}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {issue.category}
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={issue.priority || 'medium'} />
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={issue.status} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Link to={`/officer/issues/${issue._id}`}>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            {issue.status === "open" && (
-                              <Button variant="outline" size="sm" className="gap-1">
-                                <UserPlus className="h-3 w-3" />
-                                Assign
-                              </Button>
-                            )}
+          {/* Issues List (One below the other) */}
+          <div className="space-y-4">
+            <h2 className="font-display text-lg font-semibold text-foreground mb-4">
+              Assigned Area Issues
+            </h2>
+
+            {isLoading ? (
+              <div className="p-8 text-center text-muted-foreground">Loading complaints...</div>
+            ) : filteredIssues.length === 0 ? (
+              <div className="p-12 text-center border border-dashed border-border rounded-xl bg-muted/30">
+                <p className="text-muted-foreground">No issues found matching your criteria.</p>
+              </div>
+            ) : (
+              filteredIssues.map((issue: Issue) => (
+                <div key={issue._id} className="bg-card rounded-xl border border-border/50 p-6 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    {/* Image Section */}
+                    {issue.imageLink && (
+                      <div className="w-full md:w-48 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                        <img src={issue.imageLink} alt="Issue" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+
+                    {/* Content Section */}
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold border border-border rounded px-2 py-0.5">
+                              {issue.category}
+                            </span>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </div>
+                          <h3 className="font-semibold text-lg text-foreground line-clamp-1">
+                            {issue.text.split('\n')[0] || "Issue Report"}
+                          </h3>
+                        </div>
+                        <div className="hidden sm:block text-right">
+                          <span className="text-xs text-muted-foreground block">Reported on</span>
+                          <span className="text-sm font-medium">
+                            {new Date(issue.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-muted-foreground line-clamp-2 text-sm">
+                        {issue.text}
+                      </p>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2">
+                        <div className="flex items-center gap-1">
+                          <FileText className="h-4 w-4" />
+                          <span>ID: {issue._id.substring(0, 8)}...</span>
+                        </div>
+                        {issue.reportedBy && (
+                          <div className="flex items-center gap-1">
+                            <UserX className="h-4 w-4" />
+                            <span>{issue.reportedBy.name || "Anonymous"}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          <span className="capitalize">{issue.priority || 'medium'} Priority</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex md:flex-col justify-end items-end gap-3 md:justify-center border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-6 min-w-[140px]">
+                      <StatusBadge status={issue.status} className="w-full justify-center" />
+                      <Link to={`/officer/issues/${issue._id}`} className="w-full">
+                        <Button variant="default" className="w-full">
+                          View Details
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </main>

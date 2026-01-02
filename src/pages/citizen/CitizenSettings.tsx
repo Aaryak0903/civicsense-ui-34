@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import heroBg from "@/assets/landing-bg-user.jpg";
 
 export default function CitizenSettings() {
   const { toast } = useToast();
@@ -26,10 +27,17 @@ export default function CitizenSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-dashboard relative isolate">
+      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+
       <CitizenNavbar />
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <main className="container mx-auto px-4 py-8 max-w-2xl relative">
         <div className="mb-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
             Settings
