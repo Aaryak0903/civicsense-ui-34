@@ -22,52 +22,53 @@ export function StatCard({
   className,
 }: StatCardProps) {
   const variants = {
-    default: "glass-card",
-    primary: "glass-card border-primary/20",
-    secondary: "glass-card border-secondary/20",
-    accent: "glass-card border-accent/30",
+    default: "bg-card border-border shadow-sm hover:shadow-md",
+    primary: "bg-card border-primary/20 shadow-sm hover:shadow-md hover:border-primary/30",
+    secondary: "bg-card border-secondary/20 shadow-sm hover:shadow-md hover:border-secondary/30",
+    accent: "bg-card border-accent/20 shadow-sm hover:shadow-md hover:border-accent/30",
   };
 
   const iconVariants = {
     default: "bg-muted text-muted-foreground",
-    primary: "gradient-hero text-primary-foreground shadow-lg shadow-primary/30",
-    secondary: "bg-secondary text-secondary-foreground shadow-lg shadow-secondary/30",
-    accent: "bg-accent text-accent-foreground",
+    primary: "bg-primary/10 text-primary ring-1 ring-primary/20",
+    secondary: "bg-secondary/10 text-secondary ring-1 ring-secondary/20",
+    accent: "bg-accent/10 text-accent ring-1 ring-accent/20",
   };
 
   return (
     <div
       className={cn(
-        "rounded-2xl p-6 transition-all duration-300 hover:shadow-glow-sm hover:-translate-y-1",
+        "rounded-xl p-5 border transition-all duration-300 group",
         variants[variant],
         className
       )}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="mt-2 text-4xl font-display font-bold text-gradient">
-            {value}
-          </p>
-          {trend && (
-            <p
-              className={cn(
-                "mt-2 text-sm font-semibold flex items-center gap-1",
-                trend.isPositive ? "text-secondary" : "text-destructive"
-              )}
-            >
-              {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}%
-            </p>
-          )}
-        </div>
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-sm font-medium text-muted-foreground">{title}</p>
         <div
           className={cn(
-            "rounded-xl p-3",
+            "rounded-lg p-2 transition-transform duration-300 group-hover:scale-110",
             iconVariants[variant]
           )}
         >
-          <Icon className="h-6 w-6" />
+          <Icon className="h-5 w-5" />
         </div>
+      </div>
+
+      <div className="flex items-end gap-2">
+        <h3 className="text-3xl font-display font-bold text-foreground tracking-tight">
+          {value}
+        </h3>
+        {trend && (
+          <span
+            className={cn(
+              "text-xs font-semibold mb-1.5 flex items-center gap-0.5",
+              trend.isPositive ? "text-emerald-500" : "text-destructive"
+            )}
+          >
+            {trend.isPositive ? "+" : "-"}{Math.abs(trend.value)}%
+          </span>
+        )}
       </div>
     </div>
   );

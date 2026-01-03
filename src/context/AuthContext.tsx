@@ -22,18 +22,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         const initAuth = async () => {
             const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+
             if (storedToken) {
                 setToken(storedToken);
+                // Optimistically set user if available
+                if (storedUser) {
+                    try {
+                        setUser(JSON.parse(storedUser));
+                    } catch (e) {
+                        console.error("Error parsing stored user", e);
+                    }
+                }
+
                 try {
                     const response = await authService.me();
                     if (response.success) {
                         setUser(response.data.user);
+                        localStorage.setItem('user', JSON.stringify(response.data.user)); // Update with fresh data
                     } else {
                         logout();
                     }
                 } catch (error) {
                     console.error("Failed to fetch user:", error);
-                    logout();
+                    // Don't auto-logout immediately on network error, but if token is invalid, authService.me should handle it
+                    // For now, if me() completely fails (e.g. 401), we logout
+                    // logout(); 
                 }
             }
             setIsLoading(false);
@@ -47,6 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.success && response.data.token) { // Check if token exists
             const newToken = response.data.token;
             localStorage.setItem('token', newToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             setToken(newToken);
             setUser(response.data.user);
             return response.data.user;
@@ -59,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (response.success && response.data.token) {
             const newToken = response.data.token;
             localStorage.setItem('token', newToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             setToken(newToken);
             setUser(response.data.user);
             return response.data.user;
@@ -68,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         setToken(null);
         setUser(null);
     };

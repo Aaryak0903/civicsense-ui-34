@@ -45,7 +45,7 @@ export function OfficerSidebar() {
         <Logo className="h-10 w-auto" scale="scale-100" />
         {(!collapsed || isMobile) && (
           <span className="font-display text-xl font-bold text-gradient">
-            NagrikSeva
+            CivicSense
           </span>
         )}
       </div>
@@ -139,16 +139,19 @@ export function OfficerSidebar() {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col h-screen bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border sticky top-0 transition-all duration-300",
+          "hidden lg:flex flex-col h-screen bg-card border-r border-border sticky top-0 transition-all duration-300 relative group/sidebar",
           collapsed ? "w-20" : "w-72"
         )}
       >
-        <SidebarContent />
+        <div className="h-full w-full overflow-hidden">
+          <SidebarContent />
+        </div>
+
         <Button
-          variant="glow"
+          variant="default"
           size="icon"
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-4 top-24 h-8 w-8 rounded-full"
+          className="absolute -right-4 top-24 h-8 w-8 rounded-full shadow-md z-50 border border-border"
         >
           <ChevronLeft
             className={cn(

@@ -10,6 +10,8 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 
+import landingBg from "@/assets/landing-bg-user.jpg";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -39,8 +41,15 @@ export default function LoginPage() {
 
 
       const userRole = (user as any)?.role;
+      console.log('Login successful. User Role:', userRole); // Debug log
 
-      if (userRole === "government_officer" || userRole === "officer") {
+      const userRoleLower = userRole?.toLowerCase() || '';
+
+      if (
+        userRoleLower.includes('officer') ||
+        userRoleLower.includes('admin') ||
+        userRoleLower.includes('gov')
+      ) {
         navigate("/officer/dashboard");
       } else {
         navigate("/citizen/dashboard");
@@ -150,7 +159,7 @@ export default function LoginPage() {
       <div className="hidden lg:block relative bg-muted">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(/aaru.jfif)` }}
+          style={{ backgroundImage: `url(${landingBg})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
 

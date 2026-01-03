@@ -16,7 +16,7 @@ import {
 import { Shield, Eye, EyeOff, MapPin, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
-
+import landingBg from "@/assets/landing-bg-user.jpg";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -110,7 +110,6 @@ export default function SignupPage() {
       await signup({
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
         role: formData.role,
         location: formData.role === 'government_officer' ? location : undefined,
         password: formData.password,
@@ -205,12 +204,12 @@ export default function SignupPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="citizen">Citizen</SelectItem>
-                  <SelectItem value="officer">Government Officer</SelectItem>
+                  <SelectItem value="government_officer">Government Officer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {formData.role === "officer" && (
+            {formData.role === "government_officer" && (
               <div className="space-y-2 p-4 bg-muted/40 rounded-lg border border-border/50 animate-in fade-in zoom-in-95">
                 <Label htmlFor="location" className="text-xs font-semibold uppercase text-muted-foreground">Assigned Jurisdiction</Label>
                 <div className="flex gap-2">
@@ -328,7 +327,7 @@ export default function SignupPage() {
       <div className="hidden lg:block relative bg-muted">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(/aaru.jfif)` }}
+          style={{ backgroundImage: `url(${landingBg})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
 

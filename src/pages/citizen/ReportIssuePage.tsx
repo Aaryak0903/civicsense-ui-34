@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CitizenNavbar } from "@/components/layout/CitizenNavbar";
+import { CitizenSidebar } from "@/components/layout/CitizenSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { issueService } from "@/services/issueService";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import heroBg from "@/assets/landing-bg-user.jpg";
+import { cn } from "@/lib/utils";
 
 const categories = [
   "Pothole",
@@ -162,180 +162,210 @@ export default function ReportIssuePage() {
   };
 
   return (
-    <div className="min-h-screen bg-dashboard relative isolate">
-      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+    <div className="flex min-h-screen bg-background font-sans relative isolate overflow-hidden">
+      <CitizenSidebar />
 
-      <CitizenNavbar />
+      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 animate-slide-up">
+        <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+              Report an Issue
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Help improve your community by reporting civic problems
+            </p>
+          </div>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl relative">
-        <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-            Report an Issue
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Help improve your community by reporting civic problems
-          </p>
-        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Form */}
+            <div className="lg:col-span-2">
+              <div className="bg-card rounded-xl shadow-sm border border-border p-6 md:p-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Title & Category Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Issue Title</Label>
+                      <Input
+                        id="title"
+                        placeholder="e.g., Deep pothole on Main St"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className="bg-background"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category</Label>
+                      <Select
+                        value={formData.category}
+                        onValueChange={(value) => setFormData({ ...formData, category: value })}
+                      >
+                        <SelectTrigger id="category" className="bg-background">
+                          <SelectValue placeholder="Select Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category.toLowerCase()}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
 
-        {nearbyIssues.length > 0 && (
-          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-amber-800 dark:text-amber-400 mb-1">
-                  Similar Issues Nearby
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Describe the issue in detail..."
+                      rows={5}
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="bg-background resize-none"
+                      required
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="location">Location</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 px-2 text-xs text-primary hover:bg-primary/10"
+                        onClick={getCurrentLocation}
+                        disabled={isGettingLocation}
+                      >
+                        <MapPin className="h-3 w-3 mr-1" />
+                        {isGettingLocation ? "Detecting..." : "Detect my location"}
+                      </Button>
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="location"
+                        placeholder="Enter address or detect location"
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        className="pr-10 bg-background"
+                        required
+                      />
+                      <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Image Upload */}
+                  <div className="space-y-2">
+                    <Label>Evidence Photo</Label>
+                    <div className="mt-1">
+                      {imagePreview ? (
+                        <div className="relative rounded-lg overflow-hidden border border-border group max-w-sm">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => setImagePreview(null)}
+                            >
+                              <X className="h-4 w-4 mr-2" /> Remove
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center w-full">
+                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-all bg-muted/20">
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                              <Upload className="h-8 w-8 text-muted-foreground mb-3" />
+                              <p className="text-sm text-muted-foreground">
+                                <span className="font-semibold text-primary">Click to upload</span> or drag and drop
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                            </div>
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <Button type="submit" size="lg" className="w-full md:w-auto min-w-[200px]" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <>Sending...</>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" /> Submit Report
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Right Column: Tips & Nearby */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Similar Issues Card */}
+              <div className={cn(
+                "bg-card rounded-xl border p-5 transition-all text-sm",
+                nearbyIssues.length > 0 ? "border-amber-200 bg-amber-50/50" : "border-border shadow-sm"
+              )}>
+                <h3 className="font-semibold text-foreground flex items-center gap-2 mb-3">
+                  {nearbyIssues.length > 0 ? <AlertCircle className="h-4 w-4 text-amber-500" /> : <MapPin className="h-4 w-4 text-primary" />}
+                  {nearbyIssues.length > 0 ? "Similar Reports Nearby" : "No Nearby Reports"}
                 </h3>
-                <p className="text-sm text-amber-700 dark:text-amber-500 mb-3">
-                  We found {nearbyIssues.length} issues reported near your location. Please check if your issue is already listed.
-                </p>
-                <ul className="space-y-2">
-                  {nearbyIssues.slice(0, 3).map((issue: any) => (
-                    <li key={issue._id} className="text-sm bg-background/50 p-2 rounded border border-amber-100 dark:border-amber-900/50">
-                      <span className="font-medium">{issue.category}</span>: {issue.text.substring(0, 60)}...
-                      <Link to={`/citizen/issues/${issue._id}`} className="text-primary hover:underline ml-2 text-xs">View</Link>
-                    </li>
-                  ))}
+
+                {nearbyIssues.length > 0 ? (
+                  <div className="space-y-3">
+                    <p className="text-muted-foreground text-xs leading-relaxed">
+                      We found {nearbyIssues.length} issues in this area. Please check to avoid duplicates.
+                    </p>
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                      {nearbyIssues.slice(0, 5).map((issue: any) => (
+                        <Link key={issue._id} to={`/citizen/issues/${issue._id}`} className="block">
+                          <div className="bg-background border border-amber-100/50 hover:border-amber-300 p-3 rounded-lg transition-colors cursor-pointer group">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="font-medium text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">{issue.category}</span>
+                            </div>
+                            <p className="text-foreground text-xs line-clamp-2 mb-1 group-hover:text-primary">{issue.text}</p>
+                            <p className="text-[10px] text-muted-foreground text-right">View Details →</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-xs">
+                    Great! No other issues have been reported in this exact location recently.
+                  </p>
+                )}
+              </div>
+
+              {/* Guidelines Card */}
+              <div className="bg-muted/30 rounded-xl border border-border p-5">
+                <h3 className="font-semibold text-foreground mb-3 text-sm">Reporting Guidelines</h3>
+                <ul className="space-y-2 text-xs text-muted-foreground list-disc pl-4">
+                  <li>Take clear photos of the issue from a safe distance.</li>
+                  <li>Provide specific details about the location (landmarks).</li>
+                  <li>Keep the description objective and factual.</li>
+                  <li>Avoid including personal information in the description.</li>
                 </ul>
               </div>
             </div>
           </div>
-        )}
-
-        <div className="bg-card rounded-none md:rounded-xl shadow-2xl border-y md:border border-border overflow-hidden max-w-lg mx-auto">
-          <div className="bg-primary/5 p-6 border-b border-border/50 text-center">
-            <h2 className="font-display text-xl font-bold text-foreground">Report Issue Details</h2>
-            <p className="text-xs text-muted-foreground mt-1">Please provide accurate information</p>
-          </div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="p-6 md:p-8 space-y-5"
-          >
-            {/* Title */}
-            <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Issue Title</Label>
-              <Input
-                id="title"
-                placeholder="Brief title of the issue"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-background"
-                required
-              />
-            </div>
-
-            {/* Category */}
-            <div className="space-y-1.5">
-              <Label htmlFor="category" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Category</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
-                <SelectTrigger id="category" className="bg-background">
-                  <SelectValue placeholder="Select Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category.toLowerCase()}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-1.5">
-              <Label htmlFor="description" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Detailed description..."
-                rows={4}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-background resize-none"
-                required
-              />
-            </div>
-
-            {/* Location */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="location" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Location</Label>
-                <Button
-                  type="button"
-                  variant="link"
-                  size="sm"
-                  className="h-auto p-0 text-xs text-primary"
-                  onClick={getCurrentLocation}
-                  disabled={isGettingLocation}
-                >
-                  {isGettingLocation ? "Detecting..." : "Detect Location"}
-                </Button>
-              </div>
-              <div className="relative">
-                <Input
-                  id="location"
-                  placeholder="Address"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="pr-10 bg-background"
-                  required
-                />
-                <MapPin
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-                />
-              </div>
-            </div>
-
-            {/* Image Upload */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Evidence</Label>
-              {imagePreview ? (
-                <div className="relative rounded-lg overflow-hidden border border-border mt-1 group">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setImagePreview(null)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors mt-1 bg-background">
-                  <Upload className="h-6 w-6 text-muted-foreground mb-2" />
-                  <span className="text-xs text-muted-foreground">
-                    Upload Photo
-                  </span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                </label>
-              )}
-            </div>
-
-            {/* Submit */}
-            <Button type="submit" variant="hero" size="lg" className="w-full gap-2 mt-4 rounded-lg">
-              <Send className="h-4 w-4" />
-              Submit Issue
-            </Button>
-          </form>
         </div>
       </main>
     </div>

@@ -31,14 +31,43 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { issueService } from "@/services/issueService";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import useIssueTracker from "@/hooks/useIssueTracker";
 import { Issue } from "@/types";
-import heroBg from "@/assets/landing-bg-user.jpg";
+import { useEffect } from "react";
 
 export default function OfficerDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const updates = useIssueTracker();
+
+  useEffect(() => {
+    if (updates.length > 0) {
+      const latest = updates[0];
+      let title = "Update Received";
+      let description = "Data has been updated.";
+
+      if (latest.type === 'ISSUE_CREATED') {
+        title = "New Issue Reported";
+        const issueText = latest.data.text || latest.data.title || 'New issue in your area';
+        description = `A new issue was reported: ${issueText.substring(0, 50)}${issueText.length > 50 ? '...' : ''}`;
+      } else if (latest.type === 'ISSUE_UPDATED') {
+        title = "Issue Updated";
+        description = `Issue status changed to: ${latest.data.status}`;
+      } else if (latest.type === 'ISSUE_UPVOTED') {
+        title = "Issue Upvoted";
+        description = "An issue has been upvoted!";
+      }
+
+      toast({
+        title: title,
+        description: description,
+      });
+    }
+  }, [updates, toast]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -50,6 +79,27 @@ export default function OfficerDashboard() {
       limit: 100
     }),
   });
+
+  const queryClient = useQueryClient();
+
+  const handleStatusUpdate = async (issueId: string, newStatus: string) => {
+    try {
+      await issueService.updateIssueStatus(issueId, newStatus);
+      toast({
+        title: "Status Updated",
+        description: `Issue status changed to ${newStatus}`,
+      });
+      // Invalidate queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['issues'] });
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast({
+        title: "Update Failed",
+        description: "Could not update issue status. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const issues = data?.data || [];
 
@@ -88,17 +138,10 @@ export default function OfficerDashboard() {
   const inProgressCount = issues.filter((i: Issue) => i.status === "in-progress").length;
 
   return (
-    <div className="flex min-h-screen bg-dashboard overflow-hidden">
-      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-40 mix-blend-soft-light"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background to-secondary/35 -z-10" />
-
+    <div className="flex min-h-screen bg-background font-sans selection:bg-primary/10">
       <OfficerSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">
+      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 animate-slide-up">
         <div className="p-4 md:p-6 lg:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -106,7 +149,7 @@ export default function OfficerDashboard() {
               Officer Dashboard
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage and resolve citizen complaints
+              Showing issues within 10km of your registered location.
             </p>
           </div>
 
@@ -243,11 +286,26 @@ export default function OfficerDashboard() {
                       </div>
                     </div>
 
+// In the component body, modify actions part for each issue map
                     {/* Actions */}
                     <div className="flex md:flex-col justify-end items-end gap-3 md:justify-center border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-6 min-w-[140px]">
-                      <StatusBadge status={issue.status} className="w-full justify-center" />
+                      <Select
+                        defaultValue={issue.status}
+                        onValueChange={(value) => handleStatusUpdate(issue._id, value)}
+                      >
+                        <SelectTrigger className="w-full h-8 text-xs bg-background">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                          <SelectItem value="open">Open</SelectItem>
+                          <SelectItem value="in-progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+
                       <Link to={`/officer/issues/${issue._id}`} className="w-full">
-                        <Button variant="default" className="w-full">
+                        <Button variant="outline" size="sm" className="w-full text-xs">
                           View Details
                         </Button>
                       </Link>
