@@ -57,7 +57,7 @@ const features = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background font-sans selection:bg-primary/10">
+    <div className="min-h-screen flex flex-col bg-dashboard font-sans selection:bg-primary/10 transition-colors duration-300">
       <PublicNavbar />
 
       <main className="flex-grow">
@@ -65,7 +65,7 @@ export default function LandingPage() {
         <section className="relative pt-10 pb-20 md:pt-32 md:pb-32 px-6">
           <div className="container mx-auto max-w-5xl text-center">
             <HeroTitle className="animate-slide-up" />
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed font-light animate-slide-up opacity-0" style={{ animationDelay: "0.15s", animationFillMode: "forwards" }}>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed font-light font-display animate-slide-up opacity-0" style={{ animationDelay: "0.15s", animationFillMode: "forwards" }}>
               Connect directly with your local government to report issues, track progress, and improve your community.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up opacity-0" style={{ animationDelay: "0.3s", animationFillMode: "forwards" }}>
@@ -84,15 +84,15 @@ export default function LandingPage() {
         </section>
 
         {/* Workflow Section */}
-        <section className="py-24 bg-muted/30">
+        <section className="py-24 bg-transparent">
           <div className="container mx-auto px-6 max-w-6xl">
             <div className="grid md:grid-cols-3 gap-12">
               {steps.map((step, index) => (
-                <div key={index} className="flex flex-col items-start">
-                  <div className="mb-6 p-3 bg-background rounded-xl shadow-sm border border-border/50">
+                <div key={index} className="flex flex-col items-start p-6 rounded-2xl bg-white/40 backdrop-blur-sm border border-white/20 hover:bg-white/60 transition-colors">
+                  <div className="mb-6 p-3 bg-white/50 rounded-xl shadow-sm border border-white/30">
                     <step.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-foreground">{step.title}</h3>
+                  <h3 className="text-xl font-display font-bold mb-3 text-foreground">{step.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{step.description}</p>
                 </div>
               ))}
@@ -101,10 +101,10 @@ export default function LandingPage() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-24 px-6 border-t border-border/40">
+        <section className="py-24 px-6">
           <div className="container mx-auto max-w-6xl">
             <div className="mb-16">
-              <h2 className="text-3xl font-bold tracking-tight mb-4">Built for efficiency</h2>
+              <h2 className="text-3xl font-display font-bold tracking-tight mb-4">Built for efficiency</h2>
               <p className="text-lg text-muted-foreground max-w-2xl">
                 Advanced tools to help citizens and officials collaborate effectively.
               </p>
@@ -115,7 +115,7 @@ export default function LandingPage() {
                   <div className="mb-4 text-foreground/80 group-hover:text-primary transition-colors">
                     <feature.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {feature.description}
                   </p>
@@ -128,7 +128,7 @@ export default function LandingPage() {
         {/* Minimal CTA */}
         <section className="py-32 px-6">
           <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
+            <h2 className="text-3xl md:text-5xl font-display font-bold tracking-tight mb-6">
               Ready to make a difference?
             </h2>
             <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
@@ -144,6 +144,6 @@ export default function LandingPage() {
       </main>
 
       <Footer />
-    </div>
+    </div >
   );
 }
