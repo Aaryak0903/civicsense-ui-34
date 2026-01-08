@@ -52,14 +52,14 @@ export default function CitizenIssueDetails() {
     commentMutation.mutate(commentText);
   };
 
-  if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
-  if (!issue) return <div className="min-h-screen bg-background flex items-center justify-center">Issue not found</div>;
+  if (isLoading) return <div className="min-h-screen bg-dashboard flex items-center justify-center">Loading...</div>;
+  if (!issue) return <div className="min-h-screen bg-dashboard flex items-center justify-center">Issue not found</div>;
 
   return (
-    <div className="flex min-h-screen bg-background font-sans relative isolate overflow-hidden">
+    <div className="flex h-screen bg-dashboard font-sans relative isolate overflow-hidden">
       <CitizenSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 animate-slide-up">
+      <main className="flex-1 pt-14 lg:pt-0 animate-slide-up overflow-y-auto">
         <div className="p-4 md:p-6 lg:p-8">
           <Link to="/citizen/dashboard">
             <Button variant="ghost" className="mb-6 gap-2">

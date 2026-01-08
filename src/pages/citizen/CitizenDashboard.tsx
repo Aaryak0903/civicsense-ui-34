@@ -88,10 +88,10 @@ export default function CitizenDashboard() {
   const recentMyIssues = myIssues.slice(0, 3);
 
   return (
-    <div className="flex min-h-screen bg-background font-sans selection:bg-primary/10">
+    <div className="flex h-screen bg-dashboard font-sans overflow-hidden selection:bg-primary/10">
       <CitizenSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 animate-slide-up">
+      <main className="flex-1 pt-14 lg:pt-0 animate-slide-up overflow-y-auto">
         <div className="p-4 md:p-6 lg:p-8">
 
           {/* Header */}
@@ -236,7 +236,7 @@ export default function CitizenDashboard() {
 
                       <div className="absolute bottom-2 left-2 right-2 flex items-center gap-1 bg-black/60 backdrop-blur-md text-white text-xs px-2 py-1.5 rounded-lg max-w-fit">
                         <MapPin className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{issue.region || cityExtract(issue.location?.address) || "Unknown Location"}</span>
+                        <span className="truncate">{issue.location?.address || issue.region || "Unknown Location"}</span>
                       </div>
                     </div>
 

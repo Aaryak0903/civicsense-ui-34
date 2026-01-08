@@ -82,10 +82,10 @@ export default function IssueDetailsPage() {
   if (!issue) return <div className="flex min-h-screen bg-background items-center justify-center">Issue not found</div>;
 
   return (
-    <div className="flex min-h-screen bg-background font-sans relative isolate overflow-hidden">
+    <div className="flex h-screen bg-dashboard font-sans relative isolate overflow-hidden">
       <OfficerSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">
+      <main className="flex-1 pt-14 lg:pt-0 overflow-y-auto">
         <div className="p-4 md:p-6 lg:p-8">
           {/* Back Button */}
           <Link to="/officer/dashboard">

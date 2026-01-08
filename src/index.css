@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@10..48,400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -100,7 +100,8 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Sora', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    letter-spacing: -0.015em;
   }
 
   h1,
@@ -109,7 +110,9 @@
   h4,
   h5,
   h6 {
-    font-family: 'Outfit', 'Sora', system-ui, sans-serif;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    letter-spacing: -0.03em;
+    font-weight: 700;
   }
 }
 
@@ -220,13 +223,14 @@
 
   .bg-dashboard {
     @apply relative isolate overflow-hidden;
-    background-color: hsl(230 35% 91%);
-    /* Slightly darker slate base for better contrast */
+    background-color: #FDFBFF;
     background-image:
-      radial-gradient(at 0% 0%, hsl(var(--primary) / 0.15) 0px, transparent 55%),
-      radial-gradient(at 100% 0%, hsl(var(--secondary) / 0.12) 0px, transparent 55%),
-      radial-gradient(at 100% 100%, hsl(var(--accent) / 0.08) 0px, transparent 55%),
-      radial-gradient(at 0% 100%, hsl(var(--primary) / 0.08) 0px, transparent 55%);
+      radial-gradient(at 15% 15%, hsl(265 90% 94%) 0px, transparent 50%),
+      radial-gradient(at 85% 15%, hsl(330 80% 94%) 0px, transparent 50%),
+      radial-gradient(at 20% 50%, hsl(265 80% 96%) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsl(30 90% 94%) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, hsl(270 70% 96%) 0px, transparent 50%),
+      radial-gradient(at 50% 90%, hsl(240 80% 97%) 0px, transparent 50%);
   }
 }
 

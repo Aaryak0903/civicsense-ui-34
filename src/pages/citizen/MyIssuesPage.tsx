@@ -46,10 +46,10 @@ export default function MyIssuesPage() {
   });
 
   return (
-    <div className="flex min-h-screen bg-background font-sans relative isolate overflow-hidden">
+    <div className="flex h-screen bg-dashboard font-sans relative isolate overflow-hidden">
       <CitizenSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 animate-slide-up">
+      <main className="flex-1 pt-14 lg:pt-0 animate-slide-up overflow-y-auto">
         <div className="p-4 md:p-6 lg:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>

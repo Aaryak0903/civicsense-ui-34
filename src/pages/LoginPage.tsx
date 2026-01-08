@@ -166,7 +166,7 @@ export default function LoginPage() {
         <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
           <blockquote className="space-y-2">
             <p className="text-2xl font-medium leading-relaxed">
-              "CivicSense has transformed how we interact with our local government. It's transparent, fast, and empowering."
+              "NagrikSeva has transformed how we interact with our local government. It's transparent, fast, and empowering."
             </p>
             <footer className="text-white/80 text-sm font-medium mt-4">
               &mdash; Priya Sharma, Community Leader

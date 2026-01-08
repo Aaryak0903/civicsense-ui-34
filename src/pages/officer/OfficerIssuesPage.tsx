@@ -50,17 +50,10 @@ export default function OfficerIssuesPage() {
   });
 
   return (
-    <div className="flex min-h-screen bg-dashboard relative isolate overflow-hidden">
-      {/* Background Image with Rich Overlay - Consistent with Landing/Login */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat fixed -z-20 opacity-20"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
-
+    <div className="flex h-screen bg-dashboard font-sans relative isolate overflow-hidden">
       <OfficerSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">
+      <main className="flex-1 pt-14 lg:pt-0 overflow-y-auto">
         <div className="p-4 md:p-6 lg:p-8">
           <div className="mb-8">
             <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">

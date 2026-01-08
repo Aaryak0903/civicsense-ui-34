@@ -117,7 +117,7 @@ export default function SignupPage() {
 
       toast({
         title: "Account Created!",
-        description: "Welcome to CivicSense. You can now login.",
+        description: "Welcome to NagrikSeva. You can now login.",
       });
 
       navigate("/login");

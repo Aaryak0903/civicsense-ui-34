@@ -14,11 +14,11 @@ export function Footer() {
                 <Zap className="h-6 w-6 text-primary-foreground" />
               </div>
               <span className="font-display text-2xl font-bold text-gradient">
-                CivicSense
+                NagrikSeva
               </span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-md leading-relaxed mb-6">
-              AI-Powered Public Welfare System. Making cities smarter, one report at a time. 
+              AI-Powered Public Welfare System. Making cities smarter, one report at a time.
               Report issues, track progress, and see real change in your community.
             </p>
             <div className="flex gap-3">
@@ -64,7 +64,7 @@ export function Footer() {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                support@civicsense.gov
+                support@NagrikSeva.gov
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <div className="p-2 rounded-lg bg-primary/10">
@@ -84,7 +84,7 @@ export function Footer() {
 
         <div className="mt-16 pt-8 border-t border-border/50">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} CivicSense. All rights reserved. A Government Initiative.
+            © {new Date().getFullYear()} NagrikSeva. All rights reserved. A Government Initiative.
           </p>
         </div>
       </div>

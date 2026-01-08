@@ -43,7 +43,7 @@ export function CitizenSidebar() {
                 <Logo className="h-10 w-auto" scale="scale-100" />
                 {(!collapsed || isMobile) && (
                     <span className="font-display text-xl font-bold text-gradient">
-                        CivicSense
+                        NagrikSeva
                     </span>
                 )}
             </div>
@@ -103,7 +103,7 @@ export function CitizenSidebar() {
                         <div className="relative flex h-9 w-9 items-center justify-center rounded-xl gradient-hero shadow-lg shadow-primary/30">
                             <Zap className="h-5 w-5 text-primary-foreground" />
                         </div>
-                        <span className="font-display text-xl font-bold text-gradient">CivicSense</span>
+                        <span className="font-display text-xl font-bold text-gradient">NagrikSeva</span>
                     </div>
                     <Button
                         variant="ghost"

@@ -28,6 +28,7 @@ import {
   UserPlus,
   Clock,
   CheckCircle2,
+  MapPin,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -138,10 +139,10 @@ export default function OfficerDashboard() {
   const inProgressCount = issues.filter((i: Issue) => i.status === "in-progress").length;
 
   return (
-    <div className="flex min-h-screen bg-background font-sans selection:bg-primary/10">
+    <div className="flex h-screen bg-dashboard font-sans overflow-hidden selection:bg-primary/10">
       <OfficerSidebar />
 
-      <main className="flex-1 lg:ml-0 pt-14 lg:pt-0 animate-slide-up">
+      <main className="flex-1 pt-14 lg:pt-0 animate-slide-up overflow-y-auto">
         <div className="p-4 md:p-6 lg:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -279,6 +280,10 @@ export default function OfficerDashboard() {
                             <span>{issue.reportedBy.name || "Anonymous"}</span>
                           </div>
                         )}
+                        <div className="flex items-center gap-1 max-w-[150px]">
+                          <MapPin className="h-4 w-4 shrink-0" />
+                          <span className="truncate" title={issue.location?.address}>{issue.location?.address || "No location"}</span>
+                        </div>
                         <div className="flex items-center gap-1">
                           <AlertTriangle className="h-4 w-4 text-amber-500" />
                           <span className="capitalize">{issue.priority || 'medium'} Priority</span>
